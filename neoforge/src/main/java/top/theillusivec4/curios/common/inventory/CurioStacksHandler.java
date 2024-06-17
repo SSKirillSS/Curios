@@ -36,6 +36,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -57,11 +58,11 @@ import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class CurioStacksHandler implements ICurioStacksHandler {
 
-  private static final UUID LEGACY_UUID = UUID.fromString("0b0eabbd-4220-4e9f-bafb-34100da2bd7e");
+  private static final ResourceLocation LEGACY_ID = ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "legacy");
 
   private final ICuriosItemHandler itemHandler;
   private final String identifier;
-  private final Map<UUID, AttributeModifier> modifiers = new HashMap<>();
+  private final Map<ResourceLocation, AttributeModifier> modifiers = new HashMap<>();
   private final Set<AttributeModifier> persistentModifiers = new HashSet<>();
   private final Set<AttributeModifier> cachedModifiers = new HashSet<>();
   private final Multimap<AttributeModifier.Operation, AttributeModifier> modifiersByOperation =
@@ -168,11 +169,11 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   }
 
   private void addLegacyChange(int shift) {
-    AttributeModifier mod = this.getModifiers().get(LEGACY_UUID);
+    AttributeModifier mod = this.getModifiers().get(LEGACY_ID);
     int current = mod != null ? (int) mod.amount() : 0;
     current += shift;
     AttributeModifier newModifier =
-        new AttributeModifier(LEGACY_UUID, "legacy", current,
+        new AttributeModifier(LEGACY_ID, current,
             AttributeModifier.Operation.ADD_VALUE);
     this.modifiers.put(newModifier.id(), newModifier);
     Collection<AttributeModifier> modifiers =
@@ -342,7 +343,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     if (!this.modifiers.isEmpty()) {
       ListTag list = new ListTag();
 
-      for (Map.Entry<UUID, AttributeModifier> modifier : this.modifiers.entrySet()) {
+      for (Map.Entry<ResourceLocation, AttributeModifier> modifier : this.modifiers.entrySet()) {
         list.add(modifier.getValue().save());
       }
       compoundNBT.put("Modifiers", list);
@@ -433,7 +434,7 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     this.update();
   }
 
-  public Map<UUID, AttributeModifier> getModifiers() {
+  public Map<ResourceLocation, AttributeModifier> getModifiers() {
     return this.modifiers;
   }
 
@@ -463,8 +464,8 @@ public class CurioStacksHandler implements ICurioStacksHandler {
     this.persistentModifiers.add(modifier);
   }
 
-  public void removeModifier(UUID uuid) {
-    AttributeModifier modifier = this.modifiers.remove(uuid);
+  public void removeModifier(ResourceLocation id) {
+    AttributeModifier modifier = this.modifiers.remove(id);
 
     if (modifier != null) {
       this.persistentModifiers.remove(modifier);
@@ -483,9 +484,9 @@ public class CurioStacksHandler implements ICurioStacksHandler {
   }
 
   public void clearModifiers() {
-    Set<UUID> ids = new HashSet<>(this.modifiers.keySet());
+    Set<ResourceLocation> ids = new HashSet<>(this.modifiers.keySet());
 
-    for (UUID id : ids) {
+    for (ResourceLocation id : ids) {
       this.removeModifier(id);
     }
   }
@@ -582,9 +583,8 @@ public class CurioStacksHandler implements ICurioStacksHandler {
       SlotContext slotContext = new SlotContext(identifier, entity, i, false, this.visible);
 
       if (!stack.isEmpty()) {
-        UUID uuid = CuriosApi.getSlotUuid(slotContext);
         Multimap<Holder<Attribute>, AttributeModifier> map =
-            CuriosApi.getAttributeModifiers(slotContext, uuid, stack);
+            CuriosApi.getAttributeModifiers(slotContext, CuriosApi.getSlotId(slotContext), stack);
         Multimap<String, AttributeModifier> slots = HashMultimap.create();
         Set<Holder<Attribute>> toRemove = new HashSet<>();
         AttributeMap attributeMap = entity.getAttributes();

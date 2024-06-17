@@ -43,9 +43,9 @@ public class CuriosTestRegistry {
   public static final Supplier<Item> CROWN = ITEMS.register("crown", CrownItem::new);
   public static final Supplier<Item> KNUCKLES = ITEMS.register("knuckles", KnucklesItem::new);
 
-  public static final Supplier<Item> TEST_ARMOR = ITEMS.register("test_armor",
-      () -> new TestArmor(ArmorMaterials.DIAMOND, ArmorItem.Type.CHESTPLATE,
-          new Item.Properties()));
+//  public static final Supplier<Item> TEST_ARMOR = ITEMS.register("test_armor",
+//      () -> new TestArmor(ArmorMaterials.DIAMOND, ArmorItem.Type.CHESTPLATE,
+//          new Item.Properties()));
 
   public static void init(IEventBus eventBus) {
     ITEMS.register(eventBus);

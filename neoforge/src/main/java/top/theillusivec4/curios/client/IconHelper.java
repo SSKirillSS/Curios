@@ -42,6 +42,6 @@ public class IconHelper implements IIconHelper {
 
   @Override
   public ResourceLocation getIcon(String identifier) {
-    return idToIcon.getOrDefault(identifier, new ResourceLocation(CuriosApi.MODID, "slot/empty_curio_slot"));
+    return idToIcon.getOrDefault(identifier, ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "slot/empty_curio_slot"));
   }
 }

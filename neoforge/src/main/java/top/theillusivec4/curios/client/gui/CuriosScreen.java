@@ -56,7 +56,7 @@ import top.theillusivec4.curios.common.network.client.CPacketToggleRender;
 public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer>
     implements RecipeUpdateListener, ICuriosScreen {
 
-  static final ResourceLocation CURIO_INVENTORY = new ResourceLocation(CuriosConstants.MOD_ID,
+  static final ResourceLocation CURIO_INVENTORY = ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID,
       "textures/gui/curios/inventory.png");
 
   private final RecipeBookComponent recipeBookGui = new RecipeBookComponent();

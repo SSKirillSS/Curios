@@ -32,7 +32,7 @@ import top.theillusivec4.curios.CuriosConstants;
 public record CPacketOpenCurios(ItemStack carried) implements CustomPacketPayload {
 
   public static final Type<CPacketOpenCurios> TYPE =
-      new Type<>(new ResourceLocation(CuriosConstants.MOD_ID, "open_curios"));
+      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "open_curios"));
 
   public static final StreamCodec<RegistryFriendlyByteBuf, CPacketOpenCurios> STREAM_CODEC =
       StreamCodec.composite(

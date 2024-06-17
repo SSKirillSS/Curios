@@ -37,7 +37,7 @@ public class CosmeticCurioSlot extends CurioSlot {
                            String identifier, int xPosition, int yPosition) {
     super(player, handler, index, identifier, xPosition, yPosition, NonNullList.create(), true);
     this.setBackground(InventoryMenu.BLOCK_ATLAS,
-        new ResourceLocation(CuriosConstants.MOD_ID, "slot/empty_cosmetic_slot"));
+        ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "slot/empty_cosmetic_slot"));
   }
 
   @Override

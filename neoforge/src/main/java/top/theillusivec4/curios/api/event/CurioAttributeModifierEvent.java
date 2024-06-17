@@ -24,8 +24,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.util.Collection;
-import java.util.UUID;
+
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
@@ -49,18 +50,18 @@ public class CurioAttributeModifierEvent extends Event {
 
   private final ItemStack stack;
   private final SlotContext slotContext;
-  private final UUID uuid;
+  private final ResourceLocation id;
   private final Multimap<Holder<Attribute>, AttributeModifier> originalModifiers;
   private Multimap<Holder<Attribute>, AttributeModifier> unmodifiableModifiers;
   @Nullable
   private Multimap<Holder<Attribute>, AttributeModifier> modifiableModifiers;
 
-  public CurioAttributeModifierEvent(ItemStack stack, SlotContext slotContext, UUID uuid,
+  public CurioAttributeModifierEvent(ItemStack stack, SlotContext slotContext, ResourceLocation id,
                                      Multimap<Holder<Attribute>, AttributeModifier> modifiers) {
     this.stack = stack;
     this.slotContext = slotContext;
     this.unmodifiableModifiers = this.originalModifiers = modifiers;
-    this.uuid = uuid;
+    this.id = id;
   }
 
   /**
@@ -147,9 +148,9 @@ public class CurioAttributeModifierEvent extends Event {
   }
 
   /**
-   * Gets a slot-unique UUID for attribute modifiers
+   * Gets a slot-unique id for attribute modifiers
    */
-  public UUID getUuid() {
-    return this.uuid;
+  public ResourceLocation getId() {
+    return this.id;
   }
 }

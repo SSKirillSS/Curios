@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -44,7 +45,6 @@ import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -56,7 +56,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.LevelAccessor;
@@ -69,7 +68,6 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.EnderManAngerEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
-import net.neoforged.neoforge.event.entity.living.LootingLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerXpEvent;
@@ -128,7 +126,7 @@ public class CuriosEventHandler {
         }
         DropRule dropRule = dropRuleOverride != null ? dropRuleOverride :
             CuriosApi.getCurio(stack).map(curio -> curio
-                .getDropRule(slotContext, evt.getSource(), evt.getLootingLevel(),
+                .getDropRule(slotContext, evt.getSource(), 0, // TODO: Waiting for reimplementing from a [Neo]Forge API'
                     evt.isRecentlyHit())).orElse(DropRule.DEFAULT);
 
         if (dropRule == DropRule.DEFAULT) {
@@ -140,7 +138,7 @@ public class CuriosEventHandler {
           continue;
         }
 
-        if (!EnchantmentHelper.hasVanishingCurse(stack) && dropRule != DropRule.DESTROY) {
+        if (stack.getEnchantmentLevel(livingEntity.level().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.VANISHING_CURSE)) == 0 && dropRule != DropRule.DESTROY) {
           drops.add(getDroppedItem(stack, livingEntity));
         }
         stacks.setStackInSlot(i, ItemStack.EMPTY);
@@ -165,7 +163,7 @@ public class CuriosEventHandler {
     for (int i = 0; i < stacks.getSlots(); i++) {
       ItemStack stack = stacks.getStackInSlot(i);
 
-      if (!stack.isEmpty() && stack.getEnchantmentLevel(Enchantments.MENDING) > 0 &&
+      if (!stack.isEmpty() && stack.getEnchantmentLevel(player.level().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.MENDING)) > 0 &&
           stack.isDamaged()) {
         evt.setCanceled(true);
         ExperienceOrb orb = evt.getOrb();
@@ -300,7 +298,7 @@ public class CuriosEventHandler {
         Map<String, ICurioStacksHandler> curios = handler.getCurios();
 
         DropRulesEvent dropRulesEvent = new DropRulesEvent(livingEntity, handler, evt.getSource(),
-            evt.getLootingLevel(), evt.isRecentlyHit());
+            0, evt.isRecentlyHit()); // TODO: Waiting for reimplementing from a [Neo]Forge API'
         NeoForge.EVENT_BUS.post(dropRulesEvent);
         List<Tuple<Predicate<ItemStack>, DropRule>> dropRules = dropRulesEvent.getOverrides();
         boolean keepInventory = false;
@@ -322,7 +320,7 @@ public class CuriosEventHandler {
         });
         CurioDropsEvent dropsEvent = NeoForge.EVENT_BUS.post(
             new CurioDropsEvent(livingEntity, handler, evt.getSource(), curioDrops,
-                evt.getLootingLevel(), evt.isRecentlyHit()));
+                0, evt.isRecentlyHit())); // TODO: Waiting for reimplementing from a [Neo]Forge API'
 
         if (!dropsEvent.isCanceled()) {
           drops.addAll(curioDrops);
@@ -442,16 +440,16 @@ public class CuriosEventHandler {
     }
   }
 
-  @SubscribeEvent
-  public void looting(LootingLevelEvent evt) {
-    DamageSource source = evt.getDamageSource();
-
-    if (source != null && source.getEntity() instanceof LivingEntity living) {
-      evt.setLootingLevel(evt.getLootingLevel() +
-          CuriosApi.getCuriosInventory(living).map(handler -> handler
-              .getLootingLevel(source, evt.getEntity(), evt.getLootingLevel())).orElse(0));
-    }
-  }
+//  @SubscribeEvent
+//  public void looting(LootingLevelEvent evt) {
+//    DamageSource source = evt.getDamageSource();
+//
+//    if (source != null && source.getEntity() instanceof LivingEntity living) {
+//      evt.setLootingLevel(evt.getLootingLevel() +
+//          CuriosApi.getCuriosInventory(living).map(handler -> handler
+//              .getLootingLevel(source, evt.getEntity(), evt.getLootingLevel())).orElse(0));
+//    }
+//  }
 
   @SubscribeEvent(priority = EventPriority.HIGHEST)
   public void onBreakBlock(BlockDropsEvent evt) {
@@ -473,12 +471,11 @@ public class CuriosEventHandler {
         }
       });
       ItemStack stack = livingEntity.getMainHandItem();
-      int bonusLevel = stack.getEnchantmentLevel(Enchantments.FORTUNE);
-      int silklevel = stack.getEnchantmentLevel(Enchantments.SILK_TOUCH);
+//      int bonusLevel = stack.getEnchantmentLevel(livingEntity.level().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.FORTUNE));
+//      int silklevel = stack.getEnchantmentLevel(livingEntity.level().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH));
       LevelAccessor level = evt.getLevel();
       evt.setDroppedExperience(evt.getState()
-              .getExpDrop(level, level.getRandom(), evt.getPos(), bonusLevel + fortuneLevel.get(),
-                      silklevel));
+              .getExpDrop(level, level.getRandom(), evt.getPos()));
     }
   }
 
@@ -557,12 +554,12 @@ public class CuriosEventHandler {
                     renderStates.size() > index && renderStates.get(index), HandlerType.EQUIPMENT);
                 NeoForge.EVENT_BUS
                     .post(new CurioChangeEvent(livingEntity, identifier, i, prevStack, stack));
-                UUID uuid = CuriosApi.getSlotUuid(slotContext);
+                ResourceLocation id = CuriosApi.getSlotId(slotContext);
                 AttributeMap attributeMap = livingEntity.getAttributes();
 
                 if (!prevStack.isEmpty()) {
                   Multimap<Holder<Attribute>, AttributeModifier> map =
-                      CuriosApi.getAttributeModifiers(slotContext, uuid, prevStack);
+                      CuriosApi.getAttributeModifiers(slotContext, id, prevStack);
                   Multimap<String, AttributeModifier> slots = HashMultimap.create();
                   Set<Holder<Attribute>> toRemove = new HashSet<>();
 
@@ -590,7 +587,7 @@ public class CuriosEventHandler {
 
                 if (!stack.isEmpty()) {
                   Multimap<Holder<Attribute>, AttributeModifier> map =
-                      CuriosApi.getAttributeModifiers(slotContext, uuid, stack);
+                      CuriosApi.getAttributeModifiers(slotContext, id, stack);
                   Multimap<String, AttributeModifier> slots = HashMultimap.create();
                   Set<Holder<Attribute>> toRemove = new HashSet<>();
 

@@ -23,9 +23,11 @@ package top.theillusivec4.curios.common.inventory;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -89,7 +91,7 @@ public class DynamicStackHandler extends ItemStackHandler implements IDynamicSta
     boolean isCreative = ctx.entity() instanceof Player player && player.isCreative();
 
     if (result == TriState.TRUE ||
-        ((existing.isEmpty() || isCreative || !EnchantmentHelper.hasBindingCurse(existing)) &&
+        ((existing.isEmpty() || isCreative || existing.getEnchantmentLevel(ctx.entity().level().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.BINDING_CURSE)) == 0) &&
             CuriosApi.getCurio(existing).map(curio -> curio.canUnequip(ctx)).orElse(true))) {
       return super.extractItem(slot, amount, simulate);
     }

@@ -29,6 +29,7 @@ import javax.annotation.Nonnull;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -149,11 +150,11 @@ public interface ICurioItem {
    * index is -1 and the wearer may be null.
    *
    * @param slotContext Context about the slot that the ItemStack is in
-   * @param uuid        Slot-unique UUID
+   * @param id          Slot-unique id
    * @return A map of attribute modifiers to apply
    */
   default Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
-      SlotContext slotContext, UUID uuid, ItemStack stack) {
+          SlotContext slotContext, ResourceLocation id, ItemStack stack) {
     return LinkedHashMultimap.create();
   }
 
@@ -264,7 +265,7 @@ public interface ICurioItem {
 
   /**
    * Retrieves a list of tooltips when displaying curio attribute modifier information returned by
-   * {@link ICurio#getAttributeModifiers(SlotContext, UUID)}. By default, this will display a list
+   * {@link ICurio#getAttributeModifiers(SlotContext, ResourceLocation)}. By default, this will display a list
    * similar to the vanilla attribute modifier tooltips.
    *
    * @param tooltips A list of {@link Component} with the attribute modifier information

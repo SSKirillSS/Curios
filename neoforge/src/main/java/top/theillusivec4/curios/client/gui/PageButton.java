@@ -35,7 +35,7 @@ public class PageButton extends Button {
   private final CuriosScreen parentGui;
   private final Type type;
   private static final ResourceLocation CURIO_INVENTORY =
-      new ResourceLocation(CuriosConstants.MOD_ID,
+          ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID,
           "textures/gui/curios/inventory_revamp.png");
 
   public PageButton(CuriosScreen parentGui, int xIn, int yIn, int widthIn, int heightIn,

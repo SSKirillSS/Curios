@@ -36,6 +36,6 @@ public class CuriosGenerator implements AdvancementProvider.AdvancementGenerator
                     .of("ring", "necklace")
                     .withIndex(MinMaxBounds.Ints.between(0, 10)))
                 .build())
-        .save(saver, new ResourceLocation("curiostest", "test"), existingFileHelper);
+        .save(saver, ResourceLocation.fromNamespaceAndPath("curiostest", "test"), existingFileHelper);
   }
 }

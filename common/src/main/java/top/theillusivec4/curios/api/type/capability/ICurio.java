@@ -30,8 +30,10 @@ import javax.annotation.Nullable;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
@@ -129,11 +131,11 @@ public interface ICurio {
    * index is -1 and the wearer may be null.
    *
    * @param slotContext Context about the slot that the ItemStack is in
-   * @param uuid        Slot-unique UUID
+   * @param id          Slot-unique id
    * @return A map of attribute modifiers to apply
    */
   default Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
-      SlotContext slotContext, UUID uuid) {
+      SlotContext slotContext, ResourceLocation id) {
     return LinkedHashMultimap.create();
   }
 
@@ -236,7 +238,7 @@ public interface ICurio {
 
   /**
    * Retrieves a list of tooltips when displaying curio attribute modifier information returned by
-   * {@link ICurio#getAttributeModifiers(SlotContext, UUID)}. By default, this will display a list
+   * {@link ICurio#getAttributeModifiers(SlotContext, ResourceLocation)}. By default, this will display a list
    * similar to the vanilla attribute modifier tooltips.
    *
    * @param tooltips A list of {@link Component} with the attribute modifier information
@@ -464,7 +466,7 @@ public interface ICurio {
   @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default int getFortuneBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
                               int index) {
-    return EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FORTUNE, curio);
+    return EnchantmentHelper.getItemEnchantmentLevel(livingEntity.level().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.FORTUNE), curio);
   }
 
   /**
@@ -474,7 +476,7 @@ public interface ICurio {
   @ApiStatus.ScheduledForRemoval(inVersion = "1.21")
   default int getLootingBonus(String identifier, LivingEntity livingEntity, ItemStack curio,
                               int index) {
-    return EnchantmentHelper.getItemEnchantmentLevel(Enchantments.LOOTING, curio);
+    return EnchantmentHelper.getItemEnchantmentLevel(livingEntity.level().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.LOOTING), curio);
   }
 
   /**

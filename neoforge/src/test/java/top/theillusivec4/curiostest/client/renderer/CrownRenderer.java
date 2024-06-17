@@ -21,7 +21,7 @@ import top.theillusivec4.curiostest.client.model.CrownModel;
 
 public class CrownRenderer<L extends LivingEntity> implements ICurioRenderer {
 
-  private static final ResourceLocation CROWN_TEXTURE = new ResourceLocation(CuriosTest.MODID,
+  private static final ResourceLocation CROWN_TEXTURE = ResourceLocation.fromNamespaceAndPath(CuriosTest.MODID,
       "textures/entity/crown.png");
   private final CrownModel<L> model;
 
@@ -43,10 +43,8 @@ public class CrownRenderer<L extends LivingEntity> implements ICurioRenderer {
                                                                         float headPitch) {
     ICurioRenderer.followHeadRotations(slotContext.entity(), this.model.crown);
     VertexConsumer vertexconsumer = ItemRenderer
-        .getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(CROWN_TEXTURE), false,
-            stack.hasFoil());
+        .getArmorFoilBuffer(renderTypeBuffer, RenderType.armorCutoutNoCull(CROWN_TEXTURE), stack.hasFoil());
     this.model
-        .renderToBuffer(matrixStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F,
-            1.0F, 1.0F);
+        .renderToBuffer(matrixStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY);
   }
 }

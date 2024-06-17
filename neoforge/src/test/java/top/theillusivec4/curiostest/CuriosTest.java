@@ -24,11 +24,13 @@ import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import net.minecraft.core.Holder;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -62,7 +64,6 @@ import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.CuriosTooltip;
 import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
 import top.theillusivec4.curios.api.type.capability.ICurio;
@@ -85,14 +86,13 @@ public class CuriosTest {
 
   public CuriosTest(IEventBus eventBus) {
     CuriosTestRegistry.init(eventBus);
-    eventBus.addListener(this::enqueue);
     eventBus.addListener(this::clientSetup);
     eventBus.addListener(this::registerLayers);
     eventBus.addListener(this::creativeTab);
     eventBus.addListener(this::registerCaps);
     eventBus.addListener(this::gatherData);
     NeoForge.EVENT_BUS.addListener(this::attributeModifier);
-    CuriosApi.registerCurioPredicate(new ResourceLocation(MODID, "test"),
+    CuriosApi.registerCurioPredicate(ResourceLocation.fromNamespaceAndPath(MODID, "test"),
         slotResult -> slotResult.stack().getItem() == Items.OAK_BOAT);
   }
 
@@ -123,8 +123,8 @@ public class CuriosTest {
         if (!livingEntity.level().isClientSide() && livingEntity.tickCount % 20 == 0) {
           livingEntity
               .addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, -1, true, true));
-          stack.hurtAndBreak(1, livingEntity.getRandom(), livingEntity,
-              () -> CuriosApi.broadcastCurioBreakEvent(slotContext));
+          stack.hurtAndBreak(1, (ServerLevel) livingEntity.level(), livingEntity,
+              (item) -> CuriosApi.broadcastCurioBreakEvent(slotContext));
         }
       }
 
@@ -157,19 +157,19 @@ public class CuriosTest {
       @Override
       public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
           SlotContext slotContext,
-          UUID uuid) {
+          ResourceLocation id) {
         Multimap<Holder<Attribute>, AttributeModifier> atts = LinkedHashMultimap.create();
         atts.put(Attributes.MOVEMENT_SPEED,
-            new AttributeModifier(uuid, CuriosTest.MODID + ":speed_bonus", 0.1,
+            new AttributeModifier(id, 0.1,
                 AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
         atts.put(Attributes.ARMOR,
-            new AttributeModifier(uuid, CuriosTest.MODID + ":armor_bonus", 2,
+            new AttributeModifier(id, 2,
                 AttributeModifier.Operation.ADD_VALUE));
         atts.put(Attributes.KNOCKBACK_RESISTANCE,
-            new AttributeModifier(uuid, CuriosTest.MODID + ":knockback_resist", 0.2,
+            new AttributeModifier(id, 0.2,
                 AttributeModifier.Operation.ADD_VALUE));
-        CuriosApi.addSlotModifier(atts, "ring", uuid, 1, AttributeModifier.Operation.ADD_VALUE);
-//        CuriosApi.addSlotModifier(atts, "curio", uuid, -1, AttributeModifier.Operation.ADDITION);
+        CuriosApi.addSlotModifier(atts, "ring", id, 1, AttributeModifier.Operation.ADD_VALUE);
+        CuriosApi.addSlotModifier(atts, "curio", id, -1, AttributeModifier.Operation.ADD_VALUE);
         return atts;
       }
 
@@ -217,13 +217,13 @@ public class CuriosTest {
       @Override
       public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
           SlotContext slotContext,
-          UUID uuid) {
+          ResourceLocation id) {
         Multimap<Holder<Attribute>, AttributeModifier> atts = LinkedHashMultimap.create();
-        atts.put(Attributes.ATTACK_DAMAGE,
-            new AttributeModifier(uuid, CuriosTest.MODID + ":attack_damage_bonus", 4,
+        atts.put(Attributes.MAX_HEALTH,
+            new AttributeModifier(id, 20,
                 AttributeModifier.Operation.ADD_VALUE));
-        CuriosApi.addSlotModifier(atts, "necklace", uuid, 2, AttributeModifier.Operation.ADD_VALUE);
-        CuriosApi.addSlotModifier(atts, "ring", uuid, -1, AttributeModifier.Operation.ADD_VALUE);
+        CuriosApi.addSlotModifier(atts, "necklace", id, 2, AttributeModifier.Operation.ADD_VALUE);
+        CuriosApi.addSlotModifier(atts, "ring", id, -1, AttributeModifier.Operation.ADD_VALUE);
         return atts;
       }
     }, CuriosTestRegistry.KNUCKLES.get());
@@ -233,11 +233,11 @@ public class CuriosTest {
 
     if (evt.getSlotContext().identifier().equals("curio")) {
       evt.clearModifiers();
-      evt.addModifier(Attributes.MAX_HEALTH, new AttributeModifier(evt.getUuid(), "test", 10.0d,
-          AttributeModifier.Operation.ADD_VALUE));
-      evt.addModifier(SlotAttribute.getOrCreate("ring"),
-          new AttributeModifier(evt.getUuid(), "test", 1.0d,
+      evt.addModifier(Attributes.MAX_HEALTH, new AttributeModifier(evt.getId(), 10.0d,
               AttributeModifier.Operation.ADD_VALUE));
+      evt.addModifier(SlotAttribute.getOrCreate("ring"),
+              new AttributeModifier(evt.getId(), 1.0d,
+                      AttributeModifier.Operation.ADD_VALUE));
     }
   }
 
@@ -252,11 +252,6 @@ public class CuriosTest {
         evt.accept(item);
       }
     }
-  }
-
-  private void enqueue(final InterModEnqueueEvent evt) {
-    InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE,
-        () -> new SlotTypeMessage.Builder("legacy").build());
   }
 
   private void clientSetup(final FMLClientSetupEvent evt) {

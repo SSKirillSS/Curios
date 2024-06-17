@@ -38,13 +38,11 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -58,7 +56,6 @@ import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
@@ -79,7 +76,6 @@ import top.theillusivec4.curios.common.data.CuriosEntityManager;
 import top.theillusivec4.curios.common.data.CuriosSlotManager;
 import top.theillusivec4.curios.common.event.CuriosEventHandler;
 import top.theillusivec4.curios.common.network.NetworkHandler;
-import top.theillusivec4.curios.common.slottype.LegacySlotManager;
 import top.theillusivec4.curios.mixin.CuriosImplMixinHooks;
 import top.theillusivec4.curios.server.SlotHelper;
 import top.theillusivec4.curios.server.command.CurioArgumentType;
@@ -92,7 +88,6 @@ public class Curios {
   public Curios(IEventBus eventBus, ModContainer modContainer) {
     CuriosRegistry.init(eventBus);
     eventBus.addListener(this::setup);
-    eventBus.addListener(this::process);
     eventBus.addListener(this::registerCaps);
     eventBus.addListener(this::registerPayloadHandler);
     NeoForge.EVENT_BUS.addListener(this::serverAboutToStart);
@@ -158,11 +153,6 @@ public class Curios {
         return null;
       }, item);
     }
-  }
-
-  private void process(InterModProcessEvent evt) {
-    LegacySlotManager.buildImcSlotTypes(evt.getIMCStream(SlotTypeMessage.REGISTER_TYPE::equals),
-        evt.getIMCStream(SlotTypeMessage.MODIFY_TYPE::equals));
   }
 
   private void serverAboutToStart(ServerAboutToStartEvent evt) {

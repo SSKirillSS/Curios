@@ -37,6 +37,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -61,10 +62,8 @@ import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
 
 public class ClientEventHandler {
 
-  private static final UUID ATTACK_DAMAGE_MODIFIER = UUID
-      .fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
-  private static final UUID ATTACK_SPEED_MODIFIER = UUID
-      .fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
+  private static final ResourceLocation ATTACK_DAMAGE_MODIFIER = ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "attack_damage");
+  private static final ResourceLocation ATTACK_SPEED_MODIFIER = ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "attack_speed");
 
   @SubscribeEvent
   public void onClientTick(ClientTickEvent.Post evt) {
@@ -177,7 +176,7 @@ public class ClientEventHandler {
         for (String identifier : slots) {
           Multimap<Holder<Attribute>, AttributeModifier> multimap =
               CuriosApi.getAttributeModifiers(new SlotContext(identifier, player, 0, false, true),
-                  UUID.randomUUID(), stack);
+                  ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, identifier), stack);
 
           if (!multimap.isEmpty()) {
             boolean init = false;
@@ -207,7 +206,7 @@ public class ClientEventHandler {
                   if (att != null) {
                     amount = amount + att.getBaseValue();
                   }
-                  amount = amount + EnchantmentHelper.getDamageBonus(stack, null);
+                  //amount = amount + EnchantmentHelper.getDamageBonus(stack, null); TODO: ???
                   flag = true;
                 } else if (attributemodifier.id() == ATTACK_SPEED_MODIFIER) {
                   AttributeInstance att = player.getAttribute(Attributes.ATTACK_SPEED);
