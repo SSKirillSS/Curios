@@ -538,11 +538,6 @@ public class CuriosEventHandler {
             if (!stack.isEmpty()) {
               stack.inventoryTick(livingEntity.level(), livingEntity, -1, false);
               currentCurio.ifPresent(curio -> curio.curioTick(slotContext));
-
-              if (livingEntity.level().isClientSide) {
-                currentCurio.ifPresent(
-                    curio -> curio.curioAnimate(identifier, index, livingEntity));
-              }
             }
 
             if (!livingEntity.level().isClientSide) {
