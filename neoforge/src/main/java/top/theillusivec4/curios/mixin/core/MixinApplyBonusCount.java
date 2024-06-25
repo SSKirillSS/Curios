@@ -21,6 +21,7 @@
 package top.theillusivec4.curios.mixin.core;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -35,23 +36,14 @@ import top.theillusivec4.curios.mixin.CuriosUtilMixinHooks;
 
 @Mixin(ApplyBonusCount.class)
 public class MixinApplyBonusCount {
-// TODO: FIX!!!
-//
-//  @Shadow
-//  @Final
-//  private Holder<Enchantment> enchantment;
-//
-//  @ModifyVariable(
-//      at = @At(
-//          value = "INVOKE_ASSIGN",
-//          target = "net/minecraft/world/item/enchantment/EnchantmentHelper.getItemEnchantmentLevel(Lnet/minecraft/world/item/enchantment/Enchantment;Lnet/minecraft/world/item/ItemStack;)I"),
-//      method = "run")
-//  private int curios$applyFortune(int enchantmentLevel, ItemStack stack, LootContext lootContext) {
-//
-//    if (this.enchantment.value() == Enchantments.FORTUNE) {
-//      return enchantmentLevel + CuriosUtilMixinHooks.getFortuneLevel(lootContext);
-//    } else {
-//      return enchantmentLevel;
-//    }
-//  }
+    @Shadow
+    @Final
+    private Holder<Enchantment> enchantment;
+
+    @ModifyVariable(method = "run", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/item/enchantment/EnchantmentHelper;getItemEnchantmentLevel(Lnet/minecraft/core/Holder;Lnet/minecraft/world/item/ItemStack;)I"))
+    public int curios$applyFortune(int original, ItemStack stack, LootContext lootContext) {
+        return enchantment == lootContext.getLevel().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.FORTUNE)
+                ? original + CuriosUtilMixinHooks.getFortuneLevel(lootContext)
+                : original;
+    }
 }
