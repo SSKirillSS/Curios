@@ -475,7 +475,7 @@ public class CuriosEventHandler {
 //      int silklevel = stack.getEnchantmentLevel(livingEntity.level().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH));
       LevelAccessor level = evt.getLevel();
       evt.setDroppedExperience(evt.getState()
-              .getExpDrop(level, level.getRandom(), evt.getPos()));
+              .getExpDrop(level, evt.getPos(), level.getBlockEntity(evt.getPos()), livingEntity, stack));
     }
   }
 
