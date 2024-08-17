@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import net.minecraft.core.Holder;
@@ -56,6 +55,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.LevelAccessor;
@@ -452,31 +452,28 @@ public class CuriosEventHandler {
 //  }
 
   @SubscribeEvent(priority = EventPriority.HIGHEST)
-  public void onBreakBlock(BlockDropsEvent evt) {
-    if (evt.getBreaker() instanceof LivingEntity livingEntity) {
-      AtomicInteger fortuneLevel = new AtomicInteger();
-      CuriosApi.getCuriosInventory(livingEntity).ifPresent(handler -> {
+  public void onBreakBlock(BlockDropsEvent event) {
+    AtomicInteger experience = new AtomicInteger(event.getDroppedExperience());
 
+    if (experience.get() <= 0 || !(event.getBreaker() instanceof LivingEntity entity))
+      return;
+
+    CuriosApi.getCuriosInventory(entity).ifPresent(handler -> {
         for (Map.Entry<String, ICurioStacksHandler> entry : handler.getCurios().entrySet()) {
-          IDynamicStackHandler stacks = entry.getValue().getStacks();
-
-          for (int i = 0; i < stacks.getSlots(); i++) {
+            IDynamicStackHandler stacks = entry.getValue().getStacks();
             NonNullList<Boolean> renderStates = entry.getValue().getRenders();
-            SlotContext slotContext = new SlotContext(entry.getKey(), livingEntity, i, false,
-                    renderStates.size() > i && renderStates.get(i));
-            fortuneLevel.addAndGet(CuriosApi.getCurio(stacks.getStackInSlot(i)).map(
-                            curio -> curio.getFortuneLevel(slotContext, null))
-                    .orElse(0));
-          }
+
+            for (int i = 0; i < stacks.getSlots(); i++) {
+                SlotContext context = new SlotContext(entry.getKey(), entity, i, false,
+                        renderStates.size() > i && renderStates.get(i));
+
+                experience.addAndGet(EnchantmentHelper.processBlockExperience(event.getLevel(), event.getTool(),
+                        CuriosApi.getCurio(stacks.getStackInSlot(i)).map(curio -> curio.getFortuneLevel(context,null)).orElse(0)));
+            }
         }
-      });
-      ItemStack stack = livingEntity.getMainHandItem();
-//      int bonusLevel = stack.getEnchantmentLevel(livingEntity.level().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.FORTUNE));
-//      int silklevel = stack.getEnchantmentLevel(livingEntity.level().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH));
-      LevelAccessor level = evt.getLevel();
-      evt.setDroppedExperience(evt.getState()
-              .getExpDrop(level, evt.getPos(), level.getBlockEntity(evt.getPos()), livingEntity, stack));
-    }
+    });
+
+    event.setDroppedExperience(experience.get());
   }
 
   @SubscribeEvent
