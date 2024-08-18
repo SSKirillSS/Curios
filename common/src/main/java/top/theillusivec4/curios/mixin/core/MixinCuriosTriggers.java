@@ -20,7 +20,6 @@
 
 package top.theillusivec4.curios.mixin.core;
 
-import java.util.Optional;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
@@ -31,23 +30,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import top.theillusivec4.curios.api.CuriosTriggers;
 import top.theillusivec4.curios.common.util.EquipCurioTrigger;
 
+import java.util.Optional;
+
 @Mixin(value = CuriosTriggers.class, remap = false)
 public class MixinCuriosTriggers {
 
-  @Inject(at = @At("HEAD"), method = "equip(Lnet/minecraft/advancements/critereon/ItemPredicate$Builder;)Lnet/minecraft/advancements/Criterion;", cancellable = true)
-  private static void curios$equip(ItemPredicate.Builder itemPredicate,
-                                   CallbackInfoReturnable<Criterion<EquipCurioTrigger.TriggerInstance>> cir) {
-    cir.setReturnValue(EquipCurioTrigger.INSTANCE.createCriterion(
-        new EquipCurioTrigger.TriggerInstance(Optional.empty(), Optional.of(itemPredicate.build()),
-            Optional.empty(), Optional.empty())));
-  }
+    @Inject(at = @At("HEAD"), method = "equip(Lnet/minecraft/advancements/critereon/ItemPredicate$Builder;)Lnet/minecraft/advancements/Criterion;", cancellable = true)
+    private static void curios$equip(ItemPredicate.Builder itemPredicate,
+                                     CallbackInfoReturnable<Criterion<EquipCurioTrigger.TriggerInstance>> cir) {
+        cir.setReturnValue(EquipCurioTrigger.INSTANCE.createCriterion(
+                new EquipCurioTrigger.TriggerInstance(Optional.empty(), Optional.of(itemPredicate.build()),
+                        Optional.empty(), Optional.empty())));
+    }
 
-  @Inject(at = @At("HEAD"), method = "equipAtLocation", cancellable = true)
-  private static void curios$equipAtLocation(ItemPredicate.Builder itemPredicate,
-                                             LocationPredicate.Builder locationPredicate,
-                                             CallbackInfoReturnable<Criterion<EquipCurioTrigger.TriggerInstance>> cir) {
-    cir.setReturnValue(EquipCurioTrigger.INSTANCE.createCriterion(
-        new EquipCurioTrigger.TriggerInstance(Optional.empty(), Optional.of(itemPredicate.build()),
-            Optional.of(locationPredicate.build()), Optional.empty())));
-  }
+    @Inject(at = @At("HEAD"), method = "equipAtLocation", cancellable = true)
+    private static void curios$equipAtLocation(ItemPredicate.Builder itemPredicate,
+                                               LocationPredicate.Builder locationPredicate,
+                                               CallbackInfoReturnable<Criterion<EquipCurioTrigger.TriggerInstance>> cir) {
+        cir.setReturnValue(EquipCurioTrigger.INSTANCE.createCriterion(
+                new EquipCurioTrigger.TriggerInstance(Optional.empty(), Optional.of(itemPredicate.build()),
+                        Optional.of(locationPredicate.build()), Optional.empty())));
+    }
 }

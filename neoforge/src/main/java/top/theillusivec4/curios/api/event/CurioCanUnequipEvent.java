@@ -40,29 +40,29 @@ import top.theillusivec4.curios.api.SlotContext;
  */
 public class CurioCanUnequipEvent extends LivingEvent {
 
-  private final SlotContext slotContext;
-  private final ItemStack stack;
-  private TriState result;
+    private final SlotContext slotContext;
+    private final ItemStack stack;
+    private TriState result;
 
-  public CurioCanUnequipEvent(ItemStack stack, SlotContext slotContext) {
-    super(slotContext.entity());
-    this.slotContext = slotContext;
-    this.stack = stack;
-  }
+    public CurioCanUnequipEvent(ItemStack stack, SlotContext slotContext) {
+        super(slotContext.entity());
+        this.slotContext = slotContext;
+        this.stack = stack;
+    }
 
-  public TriState getUnequipResult() {
-    return this.result;
-  }
+    public TriState getUnequipResult() {
+        return this.result;
+    }
 
-  public void setUnequipResult(TriState result) {
-    this.result = result;
-  }
+    public void setUnequipResult(TriState result) {
+        this.result = result;
+    }
 
-  public SlotContext getSlotContext() {
-    return slotContext;
-  }
+    public SlotContext getSlotContext() {
+        return slotContext;
+    }
 
-  public ItemStack getStack() {
-    return stack;
-  }
+    public ItemStack getStack() {
+        return stack;
+    }
 }

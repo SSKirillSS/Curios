@@ -31,11 +31,11 @@ import top.theillusivec4.curios.mixin.CuriosUtilMixinHooks;
 @Mixin(NbtPredicate.class)
 public class MixinNbtPredicate {
 
-  @ModifyVariable(
-      at = @At("RETURN"),
-      method = "getEntityTagToCompare"
-  )
-  private static CompoundTag curios$mergeCuriosInventory(CompoundTag compoundTag, Entity entity) {
-    return CuriosUtilMixinHooks.mergeCuriosInventory(compoundTag, entity);
-  }
+    @ModifyVariable(
+            at = @At("RETURN"),
+            method = "getEntityTagToCompare"
+    )
+    private static CompoundTag curios$mergeCuriosInventory(CompoundTag compoundTag, Entity entity) {
+        return CuriosUtilMixinHooks.mergeCuriosInventory(compoundTag, entity);
+    }
 }

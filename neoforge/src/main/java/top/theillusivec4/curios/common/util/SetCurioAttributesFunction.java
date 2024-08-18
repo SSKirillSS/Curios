@@ -30,16 +30,9 @@ import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Function;
-import javax.annotation.Nonnull;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
@@ -57,128 +50,133 @@ import net.minecraft.world.level.storage.loot.providers.number.NumberProviders;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotAttribute;
 
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+
 public class SetCurioAttributesFunction extends LootItemConditionalFunction {
 
-  public static final MapCodec<SetCurioAttributesFunction> CODEC = RecordCodecBuilder.mapCodec(
-      instance -> commonFields(instance)
-          .and(
-              instance.group(
-                  ExtraCodecs.nonEmptyList(Modifier.MODIFIER_CODEC.listOf())
-                      .fieldOf("modifiers")
-                      .forGetter(function -> function.modifiers),
-                  Codec.BOOL.optionalFieldOf("replace", Boolean.TRUE)
-                      .forGetter(function -> function.replace)
-              )
-          )
-          .apply(instance, SetCurioAttributesFunction::new)
-  );
-  public static LootItemFunctionType<SetCurioAttributesFunction> TYPE = null;
+    public static final MapCodec<SetCurioAttributesFunction> CODEC = RecordCodecBuilder.mapCodec(
+            instance -> commonFields(instance)
+                    .and(
+                            instance.group(
+                                    ExtraCodecs.nonEmptyList(Modifier.MODIFIER_CODEC.listOf())
+                                            .fieldOf("modifiers")
+                                            .forGetter(function -> function.modifiers),
+                                    Codec.BOOL.optionalFieldOf("replace", Boolean.TRUE)
+                                            .forGetter(function -> function.replace)
+                            )
+                    )
+                    .apply(instance, SetCurioAttributesFunction::new)
+    );
+    public static LootItemFunctionType<SetCurioAttributesFunction> TYPE = null;
 
-  final List<Modifier> modifiers;
-  final boolean replace;
+    final List<Modifier> modifiers;
+    final boolean replace;
 
-  SetCurioAttributesFunction(List<LootItemCondition> conditions, List<Modifier> modifiers,
-                             boolean replace) {
-    super(conditions);
-    this.modifiers = ImmutableList.copyOf(modifiers);
-    this.replace = replace;
-  }
-
-  public static void register() {
-    TYPE = Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE,
-            ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "set_curio_attributes"),
-        new LootItemFunctionType<>(CODEC));
-  }
-
-  @Nonnull
-  public LootItemFunctionType<SetCurioAttributesFunction> getType() {
-    return TYPE;
-  }
-
-  @Nonnull
-  public Set<LootContextParam<?>> getReferencedContextParams() {
-    return this.modifiers.stream()
-        .flatMap((mod) -> mod.amount.getReferencedContextParams().stream())
-        .collect(ImmutableSet.toImmutableSet());
-  }
-
-  @Nonnull
-  public ItemStack run(@Nonnull ItemStack stack, LootContext context) {
-    RandomSource random = context.getRandom();
-
-    for (Modifier modifier : this.modifiers) {
-      String slot = Util.getRandom(modifier.slots, random);
-
-      if (modifier.attribute.value() instanceof SlotAttribute wrapper) {
-        CuriosApi.addSlotModifier(stack, wrapper.getIdentifier(), modifier.id,
-            modifier.amount.getFloat(context), modifier.operation, slot);
-      } else {
-        CuriosApi.addModifier(stack, modifier.attribute, modifier.id,
-            modifier.amount.getFloat(context), modifier.operation, slot);
-      }
+    SetCurioAttributesFunction(List<LootItemCondition> conditions, List<Modifier> modifiers,
+                               boolean replace) {
+        super(conditions);
+        this.modifiers = ImmutableList.copyOf(modifiers);
+        this.replace = replace;
     }
-    return stack;
-  }
 
-  record Modifier(String name, Holder<Attribute> attribute, AttributeModifier.Operation operation,
-                  NumberProvider amount, ResourceLocation id, List<String> slots) {
+    public static void register() {
+        TYPE = Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE,
+                ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "set_curio_attributes"),
+                new LootItemFunctionType<>(CODEC));
+    }
 
-    private static final Codec<List<String>> SLOTS_CODEC = ExtraCodecs.nonEmptyList(
-        Codec.either(Codec.STRING, Codec.list(Codec.STRING))
-            .xmap((either) -> either.map(List::of, Function.identity()),
-                (list) -> list.size() == 1 ? Either.left(list.getFirst()) : Either.right(list)));
+    @Nonnull
+    public LootItemFunctionType<SetCurioAttributesFunction> getType() {
+        return TYPE;
+    }
 
-    private static final Codec<Holder<Attribute>> ATTRIBUTE_CODEC = new PrimitiveCodec<>() {
-      @Override
-      public <T> DataResult<Holder<Attribute>> read(DynamicOps<T> ops, T input) {
-        return ops.getStringValue(input).map(name -> {
-          ResourceLocation rl = ResourceLocation.tryParse(name);
+    @Nonnull
+    public Set<LootContextParam<?>> getReferencedContextParams() {
+        return this.modifiers.stream()
+                .flatMap((mod) -> mod.amount.getReferencedContextParams().stream())
+                .collect(ImmutableSet.toImmutableSet());
+    }
 
-          if (rl == null) {
-            return null;
-          }
-          Holder<Attribute> attribute;
+    @Nonnull
+    public ItemStack run(@Nonnull ItemStack stack, LootContext context) {
+        RandomSource random = context.getRandom();
 
-          if (rl.getNamespace().equals("curios")) {
-            String identifier = rl.getPath();
+        for (Modifier modifier : this.modifiers) {
+            String slot = Util.getRandom(modifier.slots, random);
 
-            if (CuriosApi.getSlot(identifier, false).isEmpty()) {
-              throw new JsonSyntaxException("Unknown curios slot type: " + identifier);
+            if (modifier.attribute.value() instanceof SlotAttribute wrapper) {
+                CuriosApi.addSlotModifier(stack, wrapper.getIdentifier(), modifier.id,
+                        modifier.amount.getFloat(context), modifier.operation, slot);
+            } else {
+                CuriosApi.addModifier(stack, modifier.attribute, modifier.id,
+                        modifier.amount.getFloat(context), modifier.operation, slot);
             }
-            attribute = SlotAttribute.getOrCreate(identifier);
-          } else {
-            attribute = BuiltInRegistries.ATTRIBUTE.getHolder(rl).orElse(null);
-          }
-          return attribute;
-        });
-      }
-
-      @Override
-      public <T> T write(DynamicOps<T> ops, Holder<Attribute> value) {
-        ResourceLocation rl;
-
-        if (value.value() instanceof SlotAttribute wrapper) {
-          rl = ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, wrapper.getIdentifier());
-        } else {
-          rl = BuiltInRegistries.ATTRIBUTE.getKey(value.value());
         }
-        return rl != null ? ops.createString(rl.toString()) : ops.empty();
-      }
-    };
-    public static final Codec<Modifier> MODIFIER_CODEC =
-        RecordCodecBuilder.create((instance) -> instance.group(
-                Codec.STRING.fieldOf("name")
-                    .forGetter(Modifier::name),
-                ATTRIBUTE_CODEC.fieldOf("attribute")
-                    .forGetter(Modifier::attribute),
-                AttributeModifier.Operation.CODEC.fieldOf("operation")
-                    .forGetter(Modifier::operation),
-                NumberProviders.CODEC.fieldOf("amount")
-                    .forGetter(Modifier::amount),
-                ResourceLocation.CODEC.fieldOf("id")
-                    .forGetter(Modifier::id),
-                SLOTS_CODEC.fieldOf("slot")
-                    .forGetter(Modifier::slots))
-            .apply(instance, Modifier::new));
-  }
+        return stack;
+    }
+
+    record Modifier(String name, Holder<Attribute> attribute, AttributeModifier.Operation operation,
+                    NumberProvider amount, ResourceLocation id, List<String> slots) {
+
+        private static final Codec<List<String>> SLOTS_CODEC = ExtraCodecs.nonEmptyList(
+                Codec.either(Codec.STRING, Codec.list(Codec.STRING))
+                        .xmap((either) -> either.map(List::of, Function.identity()),
+                                (list) -> list.size() == 1 ? Either.left(list.getFirst()) : Either.right(list)));
+
+        private static final Codec<Holder<Attribute>> ATTRIBUTE_CODEC = new PrimitiveCodec<>() {
+            @Override
+            public <T> DataResult<Holder<Attribute>> read(DynamicOps<T> ops, T input) {
+                return ops.getStringValue(input).map(name -> {
+                    ResourceLocation rl = ResourceLocation.tryParse(name);
+
+                    if (rl == null) {
+                        return null;
+                    }
+                    Holder<Attribute> attribute;
+
+                    if (rl.getNamespace().equals("curios")) {
+                        String identifier = rl.getPath();
+
+                        if (CuriosApi.getSlot(identifier, false).isEmpty()) {
+                            throw new JsonSyntaxException("Unknown curios slot type: " + identifier);
+                        }
+                        attribute = SlotAttribute.getOrCreate(identifier);
+                    } else {
+                        attribute = BuiltInRegistries.ATTRIBUTE.getHolder(rl).orElse(null);
+                    }
+                    return attribute;
+                });
+            }
+
+            @Override
+            public <T> T write(DynamicOps<T> ops, Holder<Attribute> value) {
+                ResourceLocation rl;
+
+                if (value.value() instanceof SlotAttribute wrapper) {
+                    rl = ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, wrapper.getIdentifier());
+                } else {
+                    rl = BuiltInRegistries.ATTRIBUTE.getKey(value.value());
+                }
+                return rl != null ? ops.createString(rl.toString()) : ops.empty();
+            }
+        };
+        public static final Codec<Modifier> MODIFIER_CODEC =
+                RecordCodecBuilder.create((instance) -> instance.group(
+                                Codec.STRING.fieldOf("name")
+                                        .forGetter(Modifier::name),
+                                ATTRIBUTE_CODEC.fieldOf("attribute")
+                                        .forGetter(Modifier::attribute),
+                                AttributeModifier.Operation.CODEC.fieldOf("operation")
+                                        .forGetter(Modifier::operation),
+                                NumberProviders.CODEC.fieldOf("amount")
+                                        .forGetter(Modifier::amount),
+                                ResourceLocation.CODEC.fieldOf("id")
+                                        .forGetter(Modifier::id),
+                                SLOTS_CODEC.fieldOf("slot")
+                                        .forGetter(Modifier::slots))
+                        .apply(instance, Modifier::new));
+    }
 }

@@ -21,9 +21,6 @@
 package top.theillusivec4.curios.api.event;
 
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -32,6 +29,10 @@ import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurio.DropRule;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * LivingCurioDropsEvent is fired when an Entity's death causes dropped curios to appear.<br> This
@@ -47,52 +48,52 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
  **/
 public class DropRulesEvent extends LivingEvent {
 
-  private final DamageSource source;
-  private final int lootingLevel;
-  private final boolean recentlyHit;
-  private final ICuriosItemHandler curioHandler; // Curio handler for the entity
-  private final List<Tuple<Predicate<ItemStack>, DropRule>> overrides = new ArrayList<>();
-  // List of drop rule overrides
+    private final DamageSource source;
+    private final int lootingLevel;
+    private final boolean recentlyHit;
+    private final ICuriosItemHandler curioHandler; // Curio handler for the entity
+    private final List<Tuple<Predicate<ItemStack>, DropRule>> overrides = new ArrayList<>();
+    // List of drop rule overrides
 
-  public DropRulesEvent(LivingEntity entity, ICuriosItemHandler handler, DamageSource source,
-                        int lootingLevel, boolean recentlyHit) {
-    super(entity);
-    this.source = source;
-    this.lootingLevel = lootingLevel;
-    this.recentlyHit = recentlyHit;
-    this.curioHandler = handler;
-  }
+    public DropRulesEvent(LivingEntity entity, ICuriosItemHandler handler, DamageSource source,
+                          int lootingLevel, boolean recentlyHit) {
+        super(entity);
+        this.source = source;
+        this.lootingLevel = lootingLevel;
+        this.recentlyHit = recentlyHit;
+        this.curioHandler = handler;
+    }
 
-  public DamageSource getSource() {
-    return source;
-  }
+    public DamageSource getSource() {
+        return source;
+    }
 
-  public int getLootingLevel() {
-    return lootingLevel;
-  }
+    public int getLootingLevel() {
+        return lootingLevel;
+    }
 
-  public boolean isRecentlyHit() {
-    return recentlyHit;
-  }
+    public boolean isRecentlyHit() {
+        return recentlyHit;
+    }
 
-  public ICuriosItemHandler getCurioHandler() {
-    return curioHandler;
-  }
+    public ICuriosItemHandler getCurioHandler() {
+        return curioHandler;
+    }
 
-  /**
-   * Adds an override {@link ICurio.DropRule} for the given
-   * predicate. Each predicate will be applied to each ItemStack and those that pass will be given
-   * the paired DropRule.
-   *
-   * @param predicate The ItemStack predicate to apply for the DropRule
-   * @param dropRule  The DropRule to use as an override. This can be overridden further so there is
-   *                  no guarantee for the final result.
-   */
-  public void addOverride(Predicate<ItemStack> predicate, DropRule dropRule) {
-    overrides.add(new Tuple<>(predicate, dropRule));
-  }
+    /**
+     * Adds an override {@link ICurio.DropRule} for the given
+     * predicate. Each predicate will be applied to each ItemStack and those that pass will be given
+     * the paired DropRule.
+     *
+     * @param predicate The ItemStack predicate to apply for the DropRule
+     * @param dropRule  The DropRule to use as an override. This can be overridden further so there is
+     *                  no guarantee for the final result.
+     */
+    public void addOverride(Predicate<ItemStack> predicate, DropRule dropRule) {
+        overrides.add(new Tuple<>(predicate, dropRule));
+    }
 
-  public ImmutableList<Tuple<Predicate<ItemStack>, DropRule>> getOverrides() {
-    return ImmutableList.copyOf(overrides);
-  }
+    public ImmutableList<Tuple<Predicate<ItemStack>, DropRule>> getOverrides() {
+        return ImmutableList.copyOf(overrides);
+    }
 }

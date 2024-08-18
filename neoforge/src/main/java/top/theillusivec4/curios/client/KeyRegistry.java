@@ -25,6 +25,6 @@ import org.lwjgl.glfw.GLFW;
 
 public class KeyRegistry {
 
-  public static KeyMapping openCurios =
-      new KeyMapping("key.curios.open.desc", GLFW.GLFW_KEY_G, "key.curios.category");
+    public static KeyMapping openCurios =
+            new KeyMapping("key.curios.open.desc", GLFW.GLFW_KEY_G, "key.curios.category");
 }

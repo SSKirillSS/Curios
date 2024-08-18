@@ -26,8 +26,8 @@ package top.theillusivec4.curios.api.type;
  */
 public interface ICuriosMenu {
 
-  /**
-   * Resets the containing slots to reflect updated data
-   */
-  void resetSlots();
+    /**
+     * Resets the containing slots to reflect updated data
+     */
+    void resetSlots();
 }

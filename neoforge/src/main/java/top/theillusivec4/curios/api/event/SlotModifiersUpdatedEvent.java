@@ -21,9 +21,10 @@
 package top.theillusivec4.curios.api.event;
 
 import com.google.common.collect.ImmutableSet;
-import java.util.Set;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
+
+import java.util.Set;
 
 /**
  * {@link SlotModifiersUpdatedEvent} is fired when the slot size is dynamically changed during
@@ -36,14 +37,14 @@ import net.neoforged.neoforge.event.entity.living.LivingEvent;
  **/
 public class SlotModifiersUpdatedEvent extends LivingEvent {
 
-  private final Set<String> types;
+    private final Set<String> types;
 
-  public SlotModifiersUpdatedEvent(LivingEntity livingEntity, Set<String> types) {
-    super(livingEntity);
-    this.types = types;
-  }
+    public SlotModifiersUpdatedEvent(LivingEntity livingEntity, Set<String> types) {
+        super(livingEntity);
+        this.types = types;
+    }
 
-  public Set<String> getTypes() {
-    return ImmutableSet.copyOf(this.types);
-  }
+    public Set<String> getTypes() {
+        return ImmutableSet.copyOf(this.types);
+    }
 }

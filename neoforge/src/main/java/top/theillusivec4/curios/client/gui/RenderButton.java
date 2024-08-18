@@ -21,48 +21,48 @@
 package top.theillusivec4.curios.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import javax.annotation.Nonnull;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.resources.ResourceLocation;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 
+import javax.annotation.Nonnull;
+
 public class RenderButton extends ImageButton {
 
-  private final ResourceLocation resourceLocation;
-  private final int yTexStart;
-  private final int xTexStart;
-  private final CurioSlot slot;
+    private final ResourceLocation resourceLocation;
+    private final int yTexStart;
+    private final int xTexStart;
+    private final CurioSlot slot;
 
-  public RenderButton(CurioSlot slot, int xIn, int yIn, int widthIn, int heightIn, int xTexStartIn,
-                      int yTexStartIn, ResourceLocation resourceLocationIn,
-                      OnPress onPressIn) {
-    super(xIn, yIn, widthIn, heightIn, RecipeBookComponent.RECIPE_BUTTON_SPRITES, onPressIn);
-    this.resourceLocation = resourceLocationIn;
-    this.yTexStart = yTexStartIn;
-    this.xTexStart = xTexStartIn;
-    this.slot = slot;
-  }
-
-  @Override
-  public void renderWidget(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
-                           float partialTicks) {
-    // NO-OP
-  }
-
-  public void renderButtonOverlay(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
-                                  float partialTicks) {
-    RenderSystem.disableDepthTest();
-    int j = this.xTexStart;
-
-    if (!slot.getRenderStatus()) {
-      j += 8;
+    public RenderButton(CurioSlot slot, int xIn, int yIn, int widthIn, int heightIn, int xTexStartIn,
+                        int yTexStartIn, ResourceLocation resourceLocationIn,
+                        OnPress onPressIn) {
+        super(xIn, yIn, widthIn, heightIn, RecipeBookComponent.RECIPE_BUTTON_SPRITES, onPressIn);
+        this.resourceLocation = resourceLocationIn;
+        this.yTexStart = yTexStartIn;
+        this.xTexStart = xTexStartIn;
+        this.slot = slot;
     }
-    guiGraphics.blit(this.resourceLocation, this.getX(), this.getY(), (float) j,
-        (float) this.yTexStart,
-        this.width, this.height, 256, 256);
-    RenderSystem.enableDepthTest();
-  }
+
+    @Override
+    public void renderWidget(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
+                             float partialTicks) {
+        // NO-OP
+    }
+
+    public void renderButtonOverlay(@Nonnull GuiGraphics guiGraphics, int mouseX, int mouseY,
+                                    float partialTicks) {
+        RenderSystem.disableDepthTest();
+        int j = this.xTexStart;
+
+        if (!slot.getRenderStatus()) {
+            j += 8;
+        }
+        guiGraphics.blit(this.resourceLocation, this.getX(), this.getY(), (float) j,
+                (float) this.yTexStart,
+                this.width, this.height, 256, 256);
+        RenderSystem.enableDepthTest();
+    }
 }

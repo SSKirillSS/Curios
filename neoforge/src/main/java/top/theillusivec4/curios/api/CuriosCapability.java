@@ -29,22 +29,22 @@ import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 public class CuriosCapability {
 
-  public static final ResourceLocation ID_INVENTORY = ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID,
-      "inventory");
-  public static final ResourceLocation ID_ITEM_HANDLER = ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID,
-      "item_handler");
-  public static final ResourceLocation ID_ITEM = ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "item");
+    public static final ResourceLocation ID_INVENTORY = ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID,
+            "inventory");
+    public static final ResourceLocation ID_ITEM_HANDLER = ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID,
+            "item_handler");
+    public static final ResourceLocation ID_ITEM = ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "item");
 
-  public static final EntityCapability<ICuriosItemHandler, Void> INVENTORY =
-      EntityCapability.createVoid(ID_INVENTORY, ICuriosItemHandler.class);
+    public static final EntityCapability<ICuriosItemHandler, Void> INVENTORY =
+            EntityCapability.createVoid(ID_INVENTORY, ICuriosItemHandler.class);
 
-  /**
-   * A wrapper capability based on {@link IItemHandler} to provide access to curios inventory
-   * without any dependency
-   */
-  public static final EntityCapability<IItemHandler, Void> ITEM_HANDLER =
-      EntityCapability.createVoid(ID_ITEM_HANDLER, IItemHandler.class);
+    /**
+     * A wrapper capability based on {@link IItemHandler} to provide access to curios inventory
+     * without any dependency
+     */
+    public static final EntityCapability<IItemHandler, Void> ITEM_HANDLER =
+            EntityCapability.createVoid(ID_ITEM_HANDLER, IItemHandler.class);
 
-  public static final ItemCapability<ICurio, Void> ITEM =
-      ItemCapability.createVoid(ID_ITEM, ICurio.class);
+    public static final ItemCapability<ICurio, Void> ITEM =
+            ItemCapability.createVoid(ID_ITEM, ICurio.class);
 }

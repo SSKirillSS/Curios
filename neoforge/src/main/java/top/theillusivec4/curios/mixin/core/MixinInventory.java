@@ -36,31 +36,31 @@ import top.theillusivec4.curios.mixin.CuriosUtilMixinHooks;
 @Mixin(Inventory.class)
 public class MixinInventory {
 
-  @Shadow
-  @Final
-  public Player player;
+    @Shadow
+    @Final
+    public Player player;
 
-  @Inject(
-      at = @At("TAIL"),
-      method = "contains(Lnet/minecraft/world/item/ItemStack;)Z",
-      cancellable = true
-  )
-  private void curios$containsStack(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(
+            at = @At("TAIL"),
+            method = "contains(Lnet/minecraft/world/item/ItemStack;)Z",
+            cancellable = true
+    )
+    private void curios$containsStack(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
 
-    if (CuriosUtilMixinHooks.containsStack(this.player, stack)) {
-      cir.setReturnValue(true);
+        if (CuriosUtilMixinHooks.containsStack(this.player, stack)) {
+            cir.setReturnValue(true);
+        }
     }
-  }
 
-  @Inject(
-      at = @At("TAIL"),
-      method = "contains(Lnet/minecraft/tags/TagKey;)Z",
-      cancellable = true
-  )
-  private void curios$containsTag(TagKey<Item> tagKey, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(
+            at = @At("TAIL"),
+            method = "contains(Lnet/minecraft/tags/TagKey;)Z",
+            cancellable = true
+    )
+    private void curios$containsTag(TagKey<Item> tagKey, CallbackInfoReturnable<Boolean> cir) {
 
-    if (CuriosUtilMixinHooks.containsTag(this.player, tagKey)) {
-      cir.setReturnValue(true);
+        if (CuriosUtilMixinHooks.containsTag(this.player, tagKey)) {
+            cir.setReturnValue(true);
+        }
     }
-  }
 }

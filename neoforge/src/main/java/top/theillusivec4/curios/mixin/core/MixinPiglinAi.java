@@ -31,12 +31,12 @@ import top.theillusivec4.curios.mixin.CuriosUtilMixinHooks;
 @Mixin(PiglinAi.class)
 public class MixinPiglinAi {
 
-  @Inject(at = @At("RETURN"), method = "isWearingGold", cancellable = true)
-  private static void curios$isWearingGold(LivingEntity livingEntity,
-                                           CallbackInfoReturnable<Boolean> cir) {
+    @Inject(at = @At("RETURN"), method = "isWearingGold", cancellable = true)
+    private static void curios$isWearingGold(LivingEntity livingEntity,
+                                             CallbackInfoReturnable<Boolean> cir) {
 
-    if (CuriosUtilMixinHooks.canNeutralizePiglins(livingEntity)) {
-      cir.setReturnValue(true);
+        if (CuriosUtilMixinHooks.canNeutralizePiglins(livingEntity)) {
+            cir.setReturnValue(true);
+        }
     }
-  }
 }

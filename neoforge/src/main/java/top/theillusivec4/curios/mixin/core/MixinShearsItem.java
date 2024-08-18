@@ -33,14 +33,14 @@ import top.theillusivec4.curios.mixin.CuriosUtilMixinHooks;
 @Mixin(ShearsItem.class)
 public class MixinShearsItem {
 
-  @ModifyArg(
-      at = @At(
-          value = "INVOKE",
-          target = "net/neoforged/neoforge/common/IShearable.onSheared (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;I)Ljava/util/List;",
-          remap = false),
-      method = "interactLivingEntity")
-  private int curios$applyFortuneToShears(Player player, ItemStack stack, Level level, BlockPos pos,
-                                          int fortune) {
-    return fortune + CuriosUtilMixinHooks.getFortuneLevel(player);
-  }
+    @ModifyArg(
+            at = @At(
+                    value = "INVOKE",
+                    target = "net/neoforged/neoforge/common/IShearable.onSheared (Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;I)Ljava/util/List;",
+                    remap = false),
+            method = "interactLivingEntity")
+    private int curios$applyFortuneToShears(Player player, ItemStack stack, Level level, BlockPos pos,
+                                            int fortune) {
+        return fortune + CuriosUtilMixinHooks.getFortuneLevel(player);
+    }
 }

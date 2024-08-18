@@ -26,85 +26,85 @@ import top.theillusivec4.curios.CuriosConstants;
 
 public class CuriosClientConfig {
 
-  public static final ModConfigSpec CLIENT_SPEC;
-  public static final Client CLIENT;
-  private static final String CONFIG_PREFIX = "gui." + CuriosConstants.MOD_ID + ".config.";
+    public static final ModConfigSpec CLIENT_SPEC;
+    public static final Client CLIENT;
+    private static final String CONFIG_PREFIX = "gui." + CuriosConstants.MOD_ID + ".config.";
 
-  static {
-    final Pair<Client, ModConfigSpec> specPair = new ModConfigSpec.Builder()
-        .configure(Client::new);
-    CLIENT_SPEC = specPair.getRight();
-    CLIENT = specPair.getLeft();
-  }
-
-  public static class Client {
-
-    public final ModConfigSpec.BooleanValue renderCurios;
-    public final ModConfigSpec.BooleanValue enableButton;
-    public final ModConfigSpec.IntValue buttonXOffset;
-    public final ModConfigSpec.IntValue buttonYOffset;
-    public final ModConfigSpec.IntValue creativeButtonXOffset;
-    public final ModConfigSpec.IntValue creativeButtonYOffset;
-    public final ModConfigSpec.EnumValue<ButtonCorner> buttonCorner;
-
-    Client(ModConfigSpec.Builder builder) {
-
-      builder.comment("Client only settings, mostly things related to rendering").push("client");
-
-      renderCurios = builder.comment("Set to true to enable rendering curios")
-          .translation(CONFIG_PREFIX + "renderCurios").define("renderCurios", true);
-      enableButton = builder.comment("Set to true to enable the Curios GUI button")
-          .translation(CONFIG_PREFIX + "enableButton").define("enableButton", true);
-      buttonXOffset = builder.comment("The X-Offset for the Curios GUI button")
-          .translation(CONFIG_PREFIX + "buttonXOffset")
-          .defineInRange("buttonXOffset", 0, -100, 100);
-      buttonYOffset = builder.comment("The Y-Offset for the Curios GUI button")
-          .translation(CONFIG_PREFIX + "buttonYOffset")
-          .defineInRange("buttonYOffset", 0, -100, 100);
-      creativeButtonXOffset = builder.comment("The X-Offset for the Creative Curios GUI button")
-          .translation(CONFIG_PREFIX + "creativeButtonXOffset")
-          .defineInRange("creativeButtonXOffset", 0, -100, 100);
-      creativeButtonYOffset = builder.comment("The Y-Offset for the Creative Curios GUI button")
-          .translation(CONFIG_PREFIX + "creativeButtonYOffset")
-          .defineInRange("creativeButtonYOffset", 0, -100, 100);
-      buttonCorner = builder.comment("The corner for the Curios GUI button")
-          .translation(CONFIG_PREFIX + "buttonCorner")
-          .defineEnum("buttonCorner", ButtonCorner.TOP_LEFT);
-
-      builder.pop();
+    static {
+        final Pair<Client, ModConfigSpec> specPair = new ModConfigSpec.Builder()
+                .configure(Client::new);
+        CLIENT_SPEC = specPair.getRight();
+        CLIENT = specPair.getLeft();
     }
 
-    public enum ButtonCorner {
-      TOP_LEFT(26, -75, 73, -62), TOP_RIGHT(61, -75, 95, -62), BOTTOM_LEFT(26, -20, 73,
-          -29), BOTTOM_RIGHT(61, -20, 95, -29);
+    public static class Client {
 
-      final int xoffset;
-      final int yoffset;
-      final int creativeXoffset;
-      final int creativeYoffset;
+        public final ModConfigSpec.BooleanValue renderCurios;
+        public final ModConfigSpec.BooleanValue enableButton;
+        public final ModConfigSpec.IntValue buttonXOffset;
+        public final ModConfigSpec.IntValue buttonYOffset;
+        public final ModConfigSpec.IntValue creativeButtonXOffset;
+        public final ModConfigSpec.IntValue creativeButtonYOffset;
+        public final ModConfigSpec.EnumValue<ButtonCorner> buttonCorner;
 
-      ButtonCorner(int x, int y, int creativeX, int creativeY) {
-        xoffset = x;
-        yoffset = y;
-        creativeXoffset = creativeX;
-        creativeYoffset = creativeY;
-      }
+        Client(ModConfigSpec.Builder builder) {
 
-      public int getXoffset() {
-        return xoffset;
-      }
+            builder.comment("Client only settings, mostly things related to rendering").push("client");
 
-      public int getYoffset() {
-        return yoffset;
-      }
+            renderCurios = builder.comment("Set to true to enable rendering curios")
+                    .translation(CONFIG_PREFIX + "renderCurios").define("renderCurios", true);
+            enableButton = builder.comment("Set to true to enable the Curios GUI button")
+                    .translation(CONFIG_PREFIX + "enableButton").define("enableButton", true);
+            buttonXOffset = builder.comment("The X-Offset for the Curios GUI button")
+                    .translation(CONFIG_PREFIX + "buttonXOffset")
+                    .defineInRange("buttonXOffset", 0, -100, 100);
+            buttonYOffset = builder.comment("The Y-Offset for the Curios GUI button")
+                    .translation(CONFIG_PREFIX + "buttonYOffset")
+                    .defineInRange("buttonYOffset", 0, -100, 100);
+            creativeButtonXOffset = builder.comment("The X-Offset for the Creative Curios GUI button")
+                    .translation(CONFIG_PREFIX + "creativeButtonXOffset")
+                    .defineInRange("creativeButtonXOffset", 0, -100, 100);
+            creativeButtonYOffset = builder.comment("The Y-Offset for the Creative Curios GUI button")
+                    .translation(CONFIG_PREFIX + "creativeButtonYOffset")
+                    .defineInRange("creativeButtonYOffset", 0, -100, 100);
+            buttonCorner = builder.comment("The corner for the Curios GUI button")
+                    .translation(CONFIG_PREFIX + "buttonCorner")
+                    .defineEnum("buttonCorner", ButtonCorner.TOP_LEFT);
 
-      public int getCreativeXoffset() {
-        return creativeXoffset;
-      }
+            builder.pop();
+        }
 
-      public int getCreativeYoffset() {
-        return creativeYoffset;
-      }
+        public enum ButtonCorner {
+            TOP_LEFT(26, -75, 73, -62), TOP_RIGHT(61, -75, 95, -62), BOTTOM_LEFT(26, -20, 73,
+                    -29), BOTTOM_RIGHT(61, -20, 95, -29);
+
+            final int xoffset;
+            final int yoffset;
+            final int creativeXoffset;
+            final int creativeYoffset;
+
+            ButtonCorner(int x, int y, int creativeX, int creativeY) {
+                xoffset = x;
+                yoffset = y;
+                creativeXoffset = creativeX;
+                creativeYoffset = creativeY;
+            }
+
+            public int getXoffset() {
+                return xoffset;
+            }
+
+            public int getYoffset() {
+                return yoffset;
+            }
+
+            public int getCreativeXoffset() {
+                return creativeXoffset;
+            }
+
+            public int getCreativeYoffset() {
+                return creativeYoffset;
+            }
+        }
     }
-  }
 }

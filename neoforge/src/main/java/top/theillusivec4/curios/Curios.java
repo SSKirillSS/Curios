@@ -20,9 +20,6 @@
 
 package top.theillusivec4.curios;
 
-import java.util.HashSet;
-import java.util.Set;
-import javax.annotation.Nonnull;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.resources.PlayerSkin;
@@ -82,156 +79,160 @@ import top.theillusivec4.curios.server.command.CurioArgumentType;
 import top.theillusivec4.curios.server.command.CuriosCommand;
 import top.theillusivec4.curios.server.command.CuriosSelectorOptions;
 
+import javax.annotation.Nonnull;
+import java.util.HashSet;
+import java.util.Set;
+
 @Mod(CuriosConstants.MOD_ID)
 public class Curios {
 
-  public Curios(IEventBus eventBus, ModContainer modContainer) {
-    CuriosRegistry.init(eventBus);
-    eventBus.addListener(this::setup);
-    eventBus.addListener(this::registerCaps);
-    eventBus.addListener(this::registerPayloadHandler);
-    NeoForge.EVENT_BUS.addListener(this::serverAboutToStart);
-    NeoForge.EVENT_BUS.addListener(this::serverStopped);
-    NeoForge.EVENT_BUS.addListener(this::registerCommands);
-    NeoForge.EVENT_BUS.addListener(this::reload);
-    modContainer.registerConfig(ModConfig.Type.CLIENT, CuriosClientConfig.CLIENT_SPEC);
-    modContainer.registerConfig(ModConfig.Type.COMMON, CuriosConfig.COMMON_SPEC);
-    modContainer.registerConfig(ModConfig.Type.SERVER, CuriosConfig.SERVER_SPEC);
-  }
-
-  private void registerPayloadHandler(final RegisterPayloadHandlersEvent evt) {
-    NetworkHandler.register(evt.registrar("1.0"));
-  }
-
-  private void setup(FMLCommonSetupEvent evt) {
-    CuriosApi.setCuriosHelper(new CuriosHelper());
-    NeoForge.EVENT_BUS.register(new CuriosEventHandler());
-    evt.enqueueWork(CuriosSelectorOptions::register);
-  }
-
-  private void registerCaps(RegisterCapabilitiesEvent evt) {
-
-    for (EntityType<?> entityType : BuiltInRegistries.ENTITY_TYPE) {
-
-      evt.registerEntity(CuriosCapability.ITEM_HANDLER, entityType,
-          (entity, ctx) -> {
-
-            if (entity instanceof LivingEntity livingEntity) {
-
-              if (!CuriosApi.getEntitySlots(livingEntity).isEmpty()) {
-                return new CurioItemHandler(livingEntity);
-              }
-            }
-            return null;
-          });
-
-      evt.registerEntity(CuriosCapability.INVENTORY, entityType,
-          (entity, ctx) -> {
-
-            if (entity instanceof LivingEntity livingEntity) {
-
-              if (!CuriosApi.getEntitySlots(livingEntity).isEmpty()) {
-                return new CurioInventoryCapability(livingEntity);
-              }
-            }
-            return null;
-          });
+    public Curios(IEventBus eventBus, ModContainer modContainer) {
+        CuriosRegistry.init(eventBus);
+        eventBus.addListener(this::setup);
+        eventBus.addListener(this::registerCaps);
+        eventBus.addListener(this::registerPayloadHandler);
+        NeoForge.EVENT_BUS.addListener(this::serverAboutToStart);
+        NeoForge.EVENT_BUS.addListener(this::serverStopped);
+        NeoForge.EVENT_BUS.addListener(this::registerCommands);
+        NeoForge.EVENT_BUS.addListener(this::reload);
+        modContainer.registerConfig(ModConfig.Type.CLIENT, CuriosClientConfig.CLIENT_SPEC);
+        modContainer.registerConfig(ModConfig.Type.COMMON, CuriosConfig.COMMON_SPEC);
+        modContainer.registerConfig(ModConfig.Type.SERVER, CuriosConfig.SERVER_SPEC);
     }
 
-    for (Item item : BuiltInRegistries.ITEM) {
-      evt.registerItem(CuriosCapability.ITEM, (stack, ctx) -> {
-        Item it = stack.getItem();
-        ICurioItem curioItem = CuriosImplMixinHooks.getCurioFromRegistry(item).orElse(null);
+    private void registerPayloadHandler(final RegisterPayloadHandlersEvent evt) {
+        NetworkHandler.register(evt.registrar("1.0"));
+    }
 
-        if (curioItem == null && it instanceof ICurioItem itemCurio) {
-          curioItem = itemCurio;
+    private void setup(FMLCommonSetupEvent evt) {
+        CuriosApi.setCuriosHelper(new CuriosHelper());
+        NeoForge.EVENT_BUS.register(new CuriosEventHandler());
+        evt.enqueueWork(CuriosSelectorOptions::register);
+    }
+
+    private void registerCaps(RegisterCapabilitiesEvent evt) {
+
+        for (EntityType<?> entityType : BuiltInRegistries.ENTITY_TYPE) {
+
+            evt.registerEntity(CuriosCapability.ITEM_HANDLER, entityType,
+                    (entity, ctx) -> {
+
+                        if (entity instanceof LivingEntity livingEntity) {
+
+                            if (!CuriosApi.getEntitySlots(livingEntity).isEmpty()) {
+                                return new CurioItemHandler(livingEntity);
+                            }
+                        }
+                        return null;
+                    });
+
+            evt.registerEntity(CuriosCapability.INVENTORY, entityType,
+                    (entity, ctx) -> {
+
+                        if (entity instanceof LivingEntity livingEntity) {
+
+                            if (!CuriosApi.getEntitySlots(livingEntity).isEmpty()) {
+                                return new CurioInventoryCapability(livingEntity);
+                            }
+                        }
+                        return null;
+                    });
         }
 
-        if (curioItem != null && curioItem.hasCurioCapability(stack)) {
-          return new ItemizedCurioCapability(curioItem, stack);
+        for (Item item : BuiltInRegistries.ITEM) {
+            evt.registerItem(CuriosCapability.ITEM, (stack, ctx) -> {
+                Item it = stack.getItem();
+                ICurioItem curioItem = CuriosImplMixinHooks.getCurioFromRegistry(item).orElse(null);
+
+                if (curioItem == null && it instanceof ICurioItem itemCurio) {
+                    curioItem = itemCurio;
+                }
+
+                if (curioItem != null && curioItem.hasCurioCapability(stack)) {
+                    return new ItemizedCurioCapability(curioItem, stack);
+                }
+                return null;
+            }, item);
         }
-        return null;
-      }, item);
-    }
-  }
-
-  private void serverAboutToStart(ServerAboutToStartEvent evt) {
-    CuriosApi.setSlotHelper(new SlotHelper());
-    Set<String> slotIds = new HashSet<>();
-
-    for (ISlotType value : CuriosSlotManager.SERVER.getSlots().values()) {
-      CuriosApi.getSlotHelper().addSlotType(value);
-      slotIds.add(value.getIdentifier());
-    }
-    CurioArgumentType.slotIds = slotIds;
-  }
-
-  private void serverStopped(ServerStoppedEvent evt) {
-    CuriosApi.setSlotHelper(null);
-  }
-
-  private void registerCommands(RegisterCommandsEvent evt) {
-    CuriosCommand.register(evt.getDispatcher(), evt.getBuildContext());
-  }
-
-  private void reload(final AddReloadListenerEvent evt) {
-    ICondition.IContext ctx = evt.getConditionContext();
-    CuriosSlotManager.SERVER = new CuriosSlotManager(ctx);
-    evt.addListener(CuriosSlotManager.SERVER);
-    CuriosEntityManager.SERVER = new CuriosEntityManager(ctx);
-    evt.addListener(CuriosEntityManager.SERVER);
-    evt.addListener(new SimplePreparableReloadListener<Void>() {
-      @Nonnull
-      @Override
-      protected Void prepare(@Nonnull ResourceManager resourceManagerIn,
-                             @Nonnull ProfilerFiller profilerIn) {
-        return null;
-      }
-
-      @Override
-      protected void apply(@Nonnull Void objectIn, @Nonnull ResourceManager resourceManagerIn,
-                           @Nonnull ProfilerFiller profilerIn) {
-        CuriosEventHandler.dirtyTags = true;
-      }
-    });
-  }
-
-  @EventBusSubscriber(modid = CuriosConstants.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
-  public static class ClientProxy {
-
-    @SubscribeEvent
-    public static void registerKeys(final RegisterKeyMappingsEvent evt) {
-      evt.register(KeyRegistry.openCurios);
     }
 
-    @SubscribeEvent
-    public static void setupClient(FMLClientSetupEvent evt) {
-      CuriosApi.setIconHelper(new IconHelper());
-      NeoForge.EVENT_BUS.register(new ClientEventHandler());
-      NeoForge.EVENT_BUS.register(new GuiEventHandler());
+    private void serverAboutToStart(ServerAboutToStartEvent evt) {
+        CuriosApi.setSlotHelper(new SlotHelper());
+        Set<String> slotIds = new HashSet<>();
+
+        for (ISlotType value : CuriosSlotManager.SERVER.getSlots().values()) {
+            CuriosApi.getSlotHelper().addSlotType(value);
+            slotIds.add(value.getIdentifier());
+        }
+        CurioArgumentType.slotIds = slotIds;
     }
 
-    @SubscribeEvent
-    public static void registerMenuScreens(final RegisterMenuScreensEvent evt) {
-      evt.register(CuriosRegistry.CURIO_MENU.get(), CuriosScreen::new);
+    private void serverStopped(ServerStoppedEvent evt) {
+        CuriosApi.setSlotHelper(null);
     }
 
-    @SubscribeEvent
-    public static void addLayers(EntityRenderersEvent.AddLayers evt) {
-
-      for (PlayerSkin.Model skin : evt.getSkins()) {
-        addPlayerLayer(evt, skin);
-      }
-      CuriosRendererRegistry.load();
+    private void registerCommands(RegisterCommandsEvent evt) {
+        CuriosCommand.register(evt.getDispatcher(), evt.getBuildContext());
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private static void addPlayerLayer(EntityRenderersEvent.AddLayers evt, PlayerSkin.Model model) {
-      EntityRenderer<? extends Player> renderer = evt.getSkin(model);
+    private void reload(final AddReloadListenerEvent evt) {
+        ICondition.IContext ctx = evt.getConditionContext();
+        CuriosSlotManager.SERVER = new CuriosSlotManager(ctx);
+        evt.addListener(CuriosSlotManager.SERVER);
+        CuriosEntityManager.SERVER = new CuriosEntityManager(ctx);
+        evt.addListener(CuriosEntityManager.SERVER);
+        evt.addListener(new SimplePreparableReloadListener<Void>() {
+            @Nonnull
+            @Override
+            protected Void prepare(@Nonnull ResourceManager resourceManagerIn,
+                                   @Nonnull ProfilerFiller profilerIn) {
+                return null;
+            }
 
-      if (renderer instanceof LivingEntityRenderer livingRenderer) {
-        livingRenderer.addLayer(new CuriosLayer<>(livingRenderer));
-      }
+            @Override
+            protected void apply(@Nonnull Void objectIn, @Nonnull ResourceManager resourceManagerIn,
+                                 @Nonnull ProfilerFiller profilerIn) {
+                CuriosEventHandler.dirtyTags = true;
+            }
+        });
     }
-  }
+
+    @EventBusSubscriber(modid = CuriosConstants.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+    public static class ClientProxy {
+
+        @SubscribeEvent
+        public static void registerKeys(final RegisterKeyMappingsEvent evt) {
+            evt.register(KeyRegistry.openCurios);
+        }
+
+        @SubscribeEvent
+        public static void setupClient(FMLClientSetupEvent evt) {
+            CuriosApi.setIconHelper(new IconHelper());
+            NeoForge.EVENT_BUS.register(new ClientEventHandler());
+            NeoForge.EVENT_BUS.register(new GuiEventHandler());
+        }
+
+        @SubscribeEvent
+        public static void registerMenuScreens(final RegisterMenuScreensEvent evt) {
+            evt.register(CuriosRegistry.CURIO_MENU.get(), CuriosScreen::new);
+        }
+
+        @SubscribeEvent
+        public static void addLayers(EntityRenderersEvent.AddLayers evt) {
+
+            for (PlayerSkin.Model skin : evt.getSkins()) {
+                addPlayerLayer(evt, skin);
+            }
+            CuriosRendererRegistry.load();
+        }
+
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        private static void addPlayerLayer(EntityRenderersEvent.AddLayers evt, PlayerSkin.Model model) {
+            EntityRenderer<? extends Player> renderer = evt.getSkin(model);
+
+            if (renderer instanceof LivingEntityRenderer livingRenderer) {
+                livingRenderer.addLayer(new CuriosLayer<>(livingRenderer));
+            }
+        }
+    }
 }

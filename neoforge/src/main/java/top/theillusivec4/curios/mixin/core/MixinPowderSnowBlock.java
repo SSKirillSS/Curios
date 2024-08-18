@@ -32,12 +32,12 @@ import top.theillusivec4.curios.mixin.CuriosUtilMixinHooks;
 @Mixin(PowderSnowBlock.class)
 public class MixinPowderSnowBlock {
 
-  @Inject(at = @At("RETURN"), method = "canEntityWalkOnPowderSnow", cancellable = true)
-  private static void curios$canEntityWalkOnPowderSnow(Entity entity,
-                                                       CallbackInfoReturnable<Boolean> cir) {
+    @Inject(at = @At("RETURN"), method = "canEntityWalkOnPowderSnow", cancellable = true)
+    private static void curios$canEntityWalkOnPowderSnow(Entity entity,
+                                                         CallbackInfoReturnable<Boolean> cir) {
 
-    if (entity instanceof LivingEntity livingEntity && CuriosUtilMixinHooks.canWalkOnPowderSnow(livingEntity)) {
-      cir.setReturnValue(true);
+        if (entity instanceof LivingEntity livingEntity && CuriosUtilMixinHooks.canWalkOnPowderSnow(livingEntity)) {
+            cir.setReturnValue(true);
+        }
     }
-  }
 }

@@ -21,7 +21,6 @@
 package top.theillusivec4.curios.api.type.util;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 import top.theillusivec4.curios.api.type.ISlotType;
 
@@ -32,24 +31,24 @@ import top.theillusivec4.curios.api.type.ISlotType;
 @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
 public interface IIconHelper {
 
-  /**
-   * @deprecated Moved to internal code and removed from the API
-   */
-  @Deprecated(forRemoval = true, since = "1.20.1")
-  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
-  void clearIcons();
+    /**
+     * @deprecated Moved to internal code and removed from the API
+     */
+    @Deprecated(forRemoval = true, since = "1.20.1")
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
+    void clearIcons();
 
-  /**
-   * @deprecated Moved to internal code and removed from the API
-   */
-  @Deprecated(forRemoval = true, since = "1.20.1")
-  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
-  void addIcon(String identifier, ResourceLocation resourceLocation);
+    /**
+     * @deprecated Moved to internal code and removed from the API
+     */
+    @Deprecated(forRemoval = true, since = "1.20.1")
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
+    void addIcon(String identifier, ResourceLocation resourceLocation);
 
-  /**
-   * @deprecated See {@link ISlotType#getIcon()}.
-   */
-  @Deprecated(forRemoval = true, since = "1.20.1")
-  @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
-  ResourceLocation getIcon(String identifier);
+    /**
+     * @deprecated See {@link ISlotType#getIcon()}.
+     */
+    @Deprecated(forRemoval = true, since = "1.20.1")
+    @ApiStatus.ScheduledForRemoval(inVersion = "1.22")
+    ResourceLocation getIcon(String identifier);
 }

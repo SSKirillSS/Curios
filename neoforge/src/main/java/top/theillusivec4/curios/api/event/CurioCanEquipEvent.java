@@ -40,30 +40,30 @@ import top.theillusivec4.curios.api.SlotContext;
  */
 public class CurioCanEquipEvent extends LivingEvent {
 
-  private final SlotContext slotContext;
-  private final ItemStack stack;
-  private TriState result;
+    private final SlotContext slotContext;
+    private final ItemStack stack;
+    private TriState result;
 
-  public CurioCanEquipEvent(ItemStack stack, SlotContext slotContext) {
-    super(slotContext.entity());
-    this.slotContext = slotContext;
-    this.stack = stack;
-    this.result = TriState.DEFAULT;
-  }
+    public CurioCanEquipEvent(ItemStack stack, SlotContext slotContext) {
+        super(slotContext.entity());
+        this.slotContext = slotContext;
+        this.stack = stack;
+        this.result = TriState.DEFAULT;
+    }
 
-  public TriState getEquipResult() {
-    return this.result;
-  }
+    public TriState getEquipResult() {
+        return this.result;
+    }
 
-  public void setEquipResult(TriState result) {
-    this.result = result;
-  }
+    public void setEquipResult(TriState result) {
+        this.result = result;
+    }
 
-  public SlotContext getSlotContext() {
-    return this.slotContext;
-  }
+    public SlotContext getSlotContext() {
+        return this.slotContext;
+    }
 
-  public ItemStack getStack() {
-    return this.stack;
-  }
+    public ItemStack getStack() {
+        return this.stack;
+    }
 }

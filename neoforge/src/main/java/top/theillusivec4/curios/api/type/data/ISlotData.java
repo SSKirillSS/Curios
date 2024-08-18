@@ -32,27 +32,27 @@ import top.theillusivec4.curios.api.type.capability.ICurio;
  */
 public interface ISlotData {
 
-  ISlotData replace(boolean replace);
+    ISlotData replace(boolean replace);
 
-  ISlotData order(int order);
+    ISlotData order(int order);
 
-  ISlotData size(int size);
+    ISlotData size(int size);
 
-  ISlotData operation(AttributeModifier.Operation operation);
+    ISlotData operation(AttributeModifier.Operation operation);
 
-  ISlotData useNativeGui(boolean useNativeGui);
+    ISlotData useNativeGui(boolean useNativeGui);
 
-  ISlotData addCosmetic(boolean addCosmetic);
+    ISlotData addCosmetic(boolean addCosmetic);
 
-  ISlotData renderToggle(boolean renderToggle);
+    ISlotData renderToggle(boolean renderToggle);
 
-  ISlotData icon(ResourceLocation icon);
+    ISlotData icon(ResourceLocation icon);
 
-  ISlotData dropRule(ICurio.DropRule dropRule);
+    ISlotData dropRule(ICurio.DropRule dropRule);
 
-  ISlotData addCondition(ICondition condition);
+    ISlotData addCondition(ICondition condition);
 
-  ISlotData addValidator(ResourceLocation resourceLocation);
+    ISlotData addValidator(ResourceLocation resourceLocation);
 
-  JsonObject serialize(HolderLookup.Provider provider);
+    JsonObject serialize(HolderLookup.Provider provider);
 }

@@ -30,12 +30,12 @@ import top.theillusivec4.curios.mixin.CuriosUtilMixinHooks;
 @Mixin(LivingEntity.class)
 public class MixinLivingEntity {
 
-  @SuppressWarnings("ConstantConditions")
-  @Inject(at = @At("TAIL"), method = "canFreeze()Z", cancellable = true)
-  public void curio$canFreeze(CallbackInfoReturnable<Boolean> cir) {
+    @SuppressWarnings("ConstantConditions")
+    @Inject(at = @At("TAIL"), method = "canFreeze()Z", cancellable = true)
+    public void curio$canFreeze(CallbackInfoReturnable<Boolean> cir) {
 
-    if (CuriosUtilMixinHooks.isFreezeImmune((LivingEntity) (Object) this)) {
-      cir.setReturnValue(false);
+        if (CuriosUtilMixinHooks.isFreezeImmune((LivingEntity) (Object) this)) {
+            cir.setReturnValue(false);
+        }
     }
-  }
 }

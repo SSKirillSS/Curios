@@ -27,27 +27,26 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import top.theillusivec4.curios.Curios;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class CosmeticCurioSlot extends CurioSlot {
 
-  public CosmeticCurioSlot(Player player, IDynamicStackHandler handler, int index,
-                           String identifier, int xPosition, int yPosition) {
-    super(player, handler, index, identifier, xPosition, yPosition, NonNullList.create(), true);
-    this.setBackground(InventoryMenu.BLOCK_ATLAS,
-        ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "slot/empty_cosmetic_slot"));
-  }
+    public CosmeticCurioSlot(Player player, IDynamicStackHandler handler, int index,
+                             String identifier, int xPosition, int yPosition) {
+        super(player, handler, index, identifier, xPosition, yPosition, NonNullList.create(), true);
+        this.setBackground(InventoryMenu.BLOCK_ATLAS,
+                ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "slot/empty_cosmetic_slot"));
+    }
 
-  @Override
-  public boolean getRenderStatus() {
-    return true;
-  }
+    @Override
+    public boolean getRenderStatus() {
+        return true;
+    }
 
-  @OnlyIn(Dist.CLIENT)
-  @Override
-  public String getSlotName() {
-    return I18n.get("curios.cosmetic") + " " + super.getSlotName();
-  }
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public String getSlotName() {
+        return I18n.get("curios.cosmetic") + " " + super.getSlotName();
+    }
 }

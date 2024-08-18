@@ -30,15 +30,15 @@ import net.neoforged.neoforge.common.conditions.ICondition;
  */
 public interface IEntitiesData {
 
-  IEntitiesData replace(boolean replace);
+    IEntitiesData replace(boolean replace);
 
-  IEntitiesData addPlayer();
+    IEntitiesData addPlayer();
 
-  IEntitiesData addEntities(EntityType<?>... entityTypes);
+    IEntitiesData addEntities(EntityType<?>... entityTypes);
 
-  IEntitiesData addSlots(String... slots);
+    IEntitiesData addSlots(String... slots);
 
-  IEntitiesData addCondition(ICondition condition);
+    IEntitiesData addCondition(ICondition condition);
 
-  JsonObject serialize(HolderLookup.Provider provider);
+    JsonObject serialize(HolderLookup.Provider provider);
 }

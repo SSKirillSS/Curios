@@ -20,7 +20,6 @@
 
 package top.theillusivec4.curios.platform;
 
-import java.util.Map;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Player;
@@ -30,27 +29,29 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.platform.services.ICuriosPlatform;
 
+import java.util.Map;
+
 public class NeoForgeCurios implements ICuriosPlatform {
 
-  @Override
-  public Map<String, ISlotType> getItemStackSlots(ItemStack stack,
-                                                  @Nullable LivingEntity livingEntity) {
-    return livingEntity != null ? CuriosApi.getItemStackSlots(stack, livingEntity) :
-        CuriosApi.getItemStackSlots(stack, true);
-  }
+    @Override
+    public Map<String, ISlotType> getItemStackSlots(ItemStack stack,
+                                                    @Nullable LivingEntity livingEntity) {
+        return livingEntity != null ? CuriosApi.getItemStackSlots(stack, livingEntity) :
+                CuriosApi.getItemStackSlots(stack, true);
+    }
 
-  @Override
-  public boolean makesPiglinsNeutral(ItemStack stack, LivingEntity livingEntity) {
-    return stack.makesPiglinsNeutral(livingEntity);
-  }
+    @Override
+    public boolean makesPiglinsNeutral(ItemStack stack, LivingEntity livingEntity) {
+        return stack.makesPiglinsNeutral(livingEntity);
+    }
 
-  @Override
-  public boolean canWalkOnPowderedSnow(ItemStack stack, LivingEntity livingEntity) {
-    return stack.canWalkOnPowderedSnow(livingEntity);
-  }
+    @Override
+    public boolean canWalkOnPowderedSnow(ItemStack stack, LivingEntity livingEntity) {
+        return stack.canWalkOnPowderedSnow(livingEntity);
+    }
 
-  @Override
-  public boolean isEnderMask(ItemStack stack, Player player, EnderMan enderMan) {
-    return stack.isEnderMask(player, enderMan);
-  }
+    @Override
+    public boolean isEnderMask(ItemStack stack, Player player, EnderMan enderMan) {
+        return stack.isEnderMask(player, enderMan);
+    }
 }

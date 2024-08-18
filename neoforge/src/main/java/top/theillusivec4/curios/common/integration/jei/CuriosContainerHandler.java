@@ -20,42 +20,43 @@
 
 package top.theillusivec4.curios.common.integration.jei;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import javax.annotation.Nonnull;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.Rect2i;
 import top.theillusivec4.curios.client.gui.CuriosScreen;
 
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class CuriosContainerHandler implements IGuiContainerHandler<CuriosScreen> {
 
-  @Override
-  @Nonnull
-  public List<Rect2i> getGuiExtraAreas(CuriosScreen containerScreen) {
-    LocalPlayer player = containerScreen.getMinecraft().player;
+    @Override
+    @Nonnull
+    public List<Rect2i> getGuiExtraAreas(CuriosScreen containerScreen) {
+        LocalPlayer player = containerScreen.getMinecraft().player;
 
-    if (player != null) {
-      List<Rect2i> areas = new ArrayList<>();
-      int left = containerScreen.getGuiLeft() - containerScreen.panelWidth;
-      int top = containerScreen.getGuiTop();
+        if (player != null) {
+            List<Rect2i> areas = new ArrayList<>();
+            int left = containerScreen.getGuiLeft() - containerScreen.panelWidth;
+            int top = containerScreen.getGuiTop();
 
-      List<Integer> list = containerScreen.getMenu().grid;
-      int height = 0;
+            List<Integer> list = containerScreen.getMenu().grid;
+            int height = 0;
 
-      if (!list.isEmpty()) {
-        height = list.getFirst() * 18 + 14;
+            if (!list.isEmpty()) {
+                height = list.getFirst() * 18 + 14;
 
-        if (containerScreen.getMenu().hasCosmetics) {
-          areas.add(new Rect2i(containerScreen.getGuiLeft() - 30, top - 34, 28, 34));
+                if (containerScreen.getMenu().hasCosmetics) {
+                    areas.add(new Rect2i(containerScreen.getGuiLeft() - 30, top - 34, 28, 34));
+                }
+            }
+            areas.add(new Rect2i(left, top, containerScreen.panelWidth, height));
+            return areas;
+        } else {
+            return Collections.emptyList();
         }
-      }
-      areas.add(new Rect2i(left, top, containerScreen.panelWidth, height));
-      return areas;
-    } else {
-      return Collections.emptyList();
     }
-  }
 }
 

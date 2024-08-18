@@ -33,13 +33,13 @@ import top.theillusivec4.curios.common.data.SlotData;
 @Mixin(value = CuriosDataProvider.class, remap = false)
 public class MixinCuriosDataProvider {
 
-  @Inject(at = @At("HEAD"), method = "createSlotData", cancellable = true)
-  private static void curios$createSlotData(CallbackInfoReturnable<ISlotData> cir) {
-    cir.setReturnValue(new SlotData());
-  }
+    @Inject(at = @At("HEAD"), method = "createSlotData", cancellable = true)
+    private static void curios$createSlotData(CallbackInfoReturnable<ISlotData> cir) {
+        cir.setReturnValue(new SlotData());
+    }
 
-  @Inject(at = @At("HEAD"), method = "createEntitiesData", cancellable = true)
-  private static void curios$createEntitiesData(CallbackInfoReturnable<IEntitiesData> cir) {
-    cir.setReturnValue(new EntitiesData());
-  }
+    @Inject(at = @At("HEAD"), method = "createEntitiesData", cancellable = true)
+    private static void curios$createEntitiesData(CallbackInfoReturnable<IEntitiesData> cir) {
+        cir.setReturnValue(new EntitiesData());
+    }
 }

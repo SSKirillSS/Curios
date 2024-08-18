@@ -20,9 +20,6 @@
 
 package top.theillusivec4.curios.common.network.server.sync;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import javax.annotation.Nonnull;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -32,62 +29,66 @@ import net.minecraft.resources.ResourceLocation;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
+import javax.annotation.Nonnull;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class SPacketSyncCurios implements CustomPacketPayload {
 
-  public static final Type<SPacketSyncCurios> TYPE =
-      new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "sync_curios"));
-  public static final StreamCodec<RegistryFriendlyByteBuf, SPacketSyncCurios> STREAM_CODEC =
-      new StreamCodec<>() {
-        @Nonnull
-        @Override
-        public SPacketSyncCurios decode(@Nonnull RegistryFriendlyByteBuf buf) {
-          return new SPacketSyncCurios(buf);
+    public static final Type<SPacketSyncCurios> TYPE =
+            new Type<>(ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID, "sync_curios"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, SPacketSyncCurios> STREAM_CODEC =
+            new StreamCodec<>() {
+                @Nonnull
+                @Override
+                public SPacketSyncCurios decode(@Nonnull RegistryFriendlyByteBuf buf) {
+                    return new SPacketSyncCurios(buf);
+                }
+
+                @Override
+                public void encode(@Nonnull RegistryFriendlyByteBuf buf, SPacketSyncCurios packet) {
+                    buf.writeInt(packet.entityId);
+                    buf.writeInt(packet.entrySize);
+
+                    for (Map.Entry<String, CompoundTag> entry : packet.map.entrySet()) {
+                        buf.writeUtf(entry.getKey());
+                        buf.writeNbt(entry.getValue());
+                    }
+                }
+            };
+
+    public final int entityId;
+    public final int entrySize;
+    public final Map<String, CompoundTag> map;
+
+    public SPacketSyncCurios(int entityId, Map<String, ICurioStacksHandler> map) {
+        Map<String, CompoundTag> result = new LinkedHashMap<>();
+
+        for (Map.Entry<String, ICurioStacksHandler> entry : map.entrySet()) {
+            result.put(entry.getKey(), entry.getValue().getSyncTag());
         }
+        this.entityId = entityId;
+        this.entrySize = map.size();
+        this.map = result;
+    }
 
-        @Override
-        public void encode(@Nonnull RegistryFriendlyByteBuf buf, SPacketSyncCurios packet) {
-          buf.writeInt(packet.entityId);
-          buf.writeInt(packet.entrySize);
+    public SPacketSyncCurios(final FriendlyByteBuf buf) {
+        int entityId = buf.readInt();
+        int entrySize = buf.readInt();
+        Map<String, CompoundTag> map = new LinkedHashMap<>();
 
-          for (Map.Entry<String, CompoundTag> entry : packet.map.entrySet()) {
-            buf.writeUtf(entry.getKey());
-            buf.writeNbt(entry.getValue());
-          }
+        for (int i = 0; i < entrySize; i++) {
+            String key = buf.readUtf();
+            map.put(key, buf.readNbt());
         }
-      };
-
-  public final int entityId;
-  public final int entrySize;
-  public final Map<String, CompoundTag> map;
-
-  public SPacketSyncCurios(int entityId, Map<String, ICurioStacksHandler> map) {
-    Map<String, CompoundTag> result = new LinkedHashMap<>();
-
-    for (Map.Entry<String, ICurioStacksHandler> entry : map.entrySet()) {
-      result.put(entry.getKey(), entry.getValue().getSyncTag());
+        this.entityId = entityId;
+        this.entrySize = map.size();
+        this.map = map;
     }
-    this.entityId = entityId;
-    this.entrySize = map.size();
-    this.map = result;
-  }
 
-  public SPacketSyncCurios(final FriendlyByteBuf buf) {
-    int entityId = buf.readInt();
-    int entrySize = buf.readInt();
-    Map<String, CompoundTag> map = new LinkedHashMap<>();
-
-    for (int i = 0; i < entrySize; i++) {
-      String key = buf.readUtf();
-      map.put(key, buf.readNbt());
+    @Nonnull
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
-    this.entityId = entityId;
-    this.entrySize = map.size();
-    this.map = map;
-  }
-
-  @Nonnull
-  @Override
-  public Type<? extends CustomPacketPayload> type() {
-    return TYPE;
-  }
 }
