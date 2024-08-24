@@ -70,19 +70,6 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public void onKeyInput(InputEvent.Key evt) {
-        Minecraft mc = Minecraft.getInstance();
-        LocalPlayer localPlayer = mc.player;
-
-        if (localPlayer != null && localPlayer.hasContainerOpen() &&
-                !(localPlayer.containerMenu instanceof ICuriosMenu) &&
-                evt.getKey() == KeyRegistry.openCurios.getKey().getValue() &&
-                evt.getAction() == InputConstants.PRESS) {
-            localPlayer.closeContainer();
-        }
-    }
-
-    @SubscribeEvent
     public void onTooltip(ItemTooltipEvent evt) {
         ItemStack stack = evt.getItemStack();
         Player player = evt.getEntity();
