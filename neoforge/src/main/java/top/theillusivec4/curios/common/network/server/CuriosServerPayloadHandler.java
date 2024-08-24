@@ -151,7 +151,7 @@ public class CuriosServerPayloadHandler {
                         IDynamicStackHandler cosmeticStackHandler = stacksHandler.getCosmeticStacks();
                         String id = stacksHandler.getIdentifier();
 
-                        for (int i = 0; i < stackHandler.getSlots(); i++) {
+                        for (int i = stackHandler.getSlots() - 1; i >= 0; i--) {
                             NonNullList<Boolean> renderStates = stacksHandler.getRenders();
                             SlotContext slotContext = new SlotContext(id, player, i, false,
                                     renderStates.size() > i && renderStates.get(i));
