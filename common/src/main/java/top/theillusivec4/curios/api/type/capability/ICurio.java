@@ -266,12 +266,10 @@ public interface ICurio {
      * Default implementation returns level of Looting enchantment on ItemStack.
      *
      * @param slotContext Context about the slot that the ItemStack is in
-     * @param source      Damage source that triggers the looting
-     * @param target      The target that drops the loot
-     * @param baseLooting The original looting level before bonuses
+     * @param lootContext Context for the loot drops
      * @return Amount of additional Looting levels that will be applied in LootingLevelEvent
      */
-    default int getLootingLevel(SlotContext slotContext, DamageSource source, LivingEntity target, int baseLooting) {
+    default int getLootingLevel(SlotContext slotContext, @Nullable LootContext lootContext) {
         return EnchantmentHelper.getItemEnchantmentLevel(slotContext.entity().level().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.LOOTING), getStack());
     }
 

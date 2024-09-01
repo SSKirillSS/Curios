@@ -205,6 +205,11 @@ public class CuriosTest {
       public int getFortuneLevel(SlotContext slotContext, @Nullable LootContext lootContext) {
         return 3;
       }
+
+      @Override
+      public int getLootingLevel(SlotContext slotContext, @Nullable LootContext lootContext) {
+        return 3;
+      }
     }, CuriosTestRegistry.RING.get());
 
     evt.registerItem(CuriosCapability.ITEM, (stack, ctx) -> new ICurio() {

@@ -25,6 +25,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
@@ -200,10 +201,10 @@ public interface ICuriosItemHandler {
      */
     int getFortuneLevel(@Nullable LootContext lootContext);
 
-//  /**
-//   * Get the amount of Looting levels that are provided by curios.
-//   */
-//  int getLootingLevel(DamageSource source, LivingEntity target, int baseLooting);
+    /**
+     * Get the amount of Looting levels that are provided by curios.
+     */
+    int getLootingLevel(@Nullable LootContext lootContext);
 
     /**
      * Saves the curios inventory stacks to NBT.

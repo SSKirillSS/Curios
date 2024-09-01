@@ -134,6 +134,22 @@ public class CuriosUtilMixinHooks {
         }
     }
 
+    public static int getLootingLevel(Player player) {
+        return CuriosApi.getCuriosInventory(player)
+                .map(handler -> handler.getLootingLevel(null)).orElse(0);
+    }
+
+    public static int getLootingLevel(LootContext lootContext) {
+        Entity entity = lootContext.getParamOrNull(LootContextParams.ATTACKING_ENTITY);
+
+        if (entity instanceof LivingEntity livingEntity) {
+            return CuriosApi.getCuriosInventory(livingEntity)
+                    .map(handler -> handler.getLootingLevel(lootContext)).orElse(0);
+        } else {
+            return 0;
+        }
+    }
+
     public static boolean isFreezeImmune(LivingEntity livingEntity) {
         return CuriosApi.getCuriosInventory(livingEntity).map(curios -> {
             IItemHandlerModifiable handler = curios.getEquippedCurios();

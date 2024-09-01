@@ -313,27 +313,25 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
         return fortuneLevel;
     }
 
-//  @Override
-//  public int getLootingLevel(DamageSource source, LivingEntity target, int baseLooting) {
-//    int lootingLevel = 0;
-//    for (Map.Entry<String, ICurioStacksHandler> entry : getCurios().entrySet()) {
-//      IDynamicStackHandler stacks = entry.getValue().getStacks();
-//
-//      for (int i = 0; i < stacks.getSlots(); i++) {
-//        int index = i;
-//        lootingLevel += CuriosApi.getCurio(stacks.getStackInSlot(i)).map(
-//                curio -> {
-//                  NonNullList<Boolean> renderStates = entry.getValue().getRenders();
-//                  return curio.getLootingLevel(
-//                      new SlotContext(entry.getKey(), this.livingEntity, index, false,
-//                          renderStates.size() > index && renderStates.get(index)), source, target,
-//                      baseLooting);
-//                })
-//            .orElse(0);
-//      }
-//    }
-//    return lootingLevel;
-//  }
+    @Override
+    public int getLootingLevel(@Nullable LootContext lootContext) {
+        int lootingLevel = 0;
+        for (Map.Entry<String, ICurioStacksHandler> entry : getCurios().entrySet()) {
+            IDynamicStackHandler stacks = entry.getValue().getStacks();
+
+            for (int i = 0; i < stacks.getSlots(); i++) {
+                final int index = i;
+                lootingLevel += CuriosApi.getCurio(stacks.getStackInSlot(i)).map(
+                        curio -> {
+                            NonNullList<Boolean> renderStates = entry.getValue().getRenders();
+                            return curio.getLootingLevel(
+                                    new SlotContext(entry.getKey(), this.livingEntity, index, false,
+                                            renderStates.size() > index && renderStates.get(index)), lootContext);
+                        }).orElse(0);
+            }
+        }
+        return lootingLevel;
+    }
 
     @Override
     public ListTag saveInventory(boolean clear) {
