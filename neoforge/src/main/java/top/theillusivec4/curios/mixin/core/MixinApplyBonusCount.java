@@ -40,7 +40,7 @@ public class MixinApplyBonusCount {
     @Final
     private Holder<Enchantment> enchantment;
 
-    @ModifyVariable(method = "run", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/item/enchantment/EnchantmentHelper;getItemEnchantmentLevel(Lnet/minecraft/core/Holder;Lnet/minecraft/world/item/ItemStack;)I", ordinal = 0), index = 5)
+    @ModifyVariable(method = "run", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/item/enchantment/EnchantmentHelper;getItemEnchantmentLevel(Lnet/minecraft/core/Holder;Lnet/minecraft/world/item/ItemStack;)I", ordinal = 0), index = 4)
     public int curios$applyFortune(int original, ItemStack stack, LootContext lootContext) {
         return enchantment == lootContext.getLevel().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.FORTUNE)
                 ? original + CuriosUtilMixinHooks.getFortuneLevel(lootContext)
