@@ -116,7 +116,7 @@ public class MixinCuriosApi {
         ci.cancel();
     }
 
-    @Inject(at = @At("HEAD"), method = "addSlotModifier(Lnet/minecraft/world/item/ItemStack;Ljava/lang/String;Ljava/lang/String;Lnet/minecraft/resources/ResourceLocation;DLnet/minecraft/world/entity/ai/attributes/AttributeModifier$Operation;Ljava/lang/String;)V", cancellable = true)
+    @Inject(at = @At("HEAD"), method = "addSlotModifier(Lnet/minecraft/world/item/ItemStack;Ljava/lang/String;Lnet/minecraft/resources/ResourceLocation;DLnet/minecraft/world/entity/ai/attributes/AttributeModifier$Operation;Ljava/lang/String;)V", cancellable = true)
     private static void curios$addSlotModifier(ItemStack stack, String identifier, ResourceLocation id, double amount,
                                                AttributeModifier.Operation operation, String slot,
                                                CallbackInfo ci) {
