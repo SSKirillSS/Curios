@@ -22,14 +22,14 @@ package top.theillusivec4.curios.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 
 import javax.annotation.Nonnull;
 
-public class RenderButton extends ImageButton {
+public class RenderButton extends Button {
 
     private final ResourceLocation resourceLocation;
     private final int yTexStart;
@@ -39,7 +39,7 @@ public class RenderButton extends ImageButton {
     public RenderButton(CurioSlot slot, int xIn, int yIn, int widthIn, int heightIn, int xTexStartIn,
                         int yTexStartIn, ResourceLocation resourceLocationIn,
                         OnPress onPressIn) {
-        super(xIn, yIn, widthIn, heightIn, RecipeBookComponent.RECIPE_BUTTON_SPRITES, onPressIn);
+        super(xIn, yIn, widthIn, heightIn, Component.empty(), onPressIn, DEFAULT_NARRATION);
         this.resourceLocation = resourceLocationIn;
         this.yTexStart = yTexStartIn;
         this.xTexStart = xTexStartIn;
