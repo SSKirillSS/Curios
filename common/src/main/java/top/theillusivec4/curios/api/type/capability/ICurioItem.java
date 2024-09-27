@@ -22,6 +22,7 @@ package top.theillusivec4.curios.api.type.capability;
 
 import com.google.common.collect.Multimap;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -265,11 +266,12 @@ public interface ICurioItem {
      * similar to the vanilla attribute modifier tooltips.
      *
      * @param tooltips A list of {@link Component} with the attribute modifier information
+     * @param registriesProvider Registry provider for retrieving Holders of data-driven objects
      * @param stack    The ItemStack in question
      * @return A list of ITextComponent to display as curio attribute modifier information
      */
-    default List<Component> getAttributesTooltip(List<Component> tooltips, ItemStack stack) {
-        return defaultInstance.getAttributesTooltip(tooltips);
+    default List<Component> getAttributesTooltip(List<Component> tooltips, HolderLookup.Provider registriesProvider, ItemStack stack) {
+        return defaultInstance.getAttributesTooltip(tooltips, registriesProvider);
     }
 
     /**
