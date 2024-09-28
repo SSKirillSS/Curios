@@ -30,6 +30,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import top.theillusivec4.curios.api.SlotContext;
@@ -103,8 +104,13 @@ public class ItemizedCurioCapability implements ICurio {
     }
 
     @Override
-    public List<Component> getAttributesTooltip(List<Component> tooltips, HolderLookup.Provider registriesProvider) {
-        return this.curioItem.getAttributesTooltip(tooltips, registriesProvider, this.getStack());
+    public List<Component> getAttributesTooltip(List<Component> tooltips, Item.TooltipContext context) {
+        return this.curioItem.getAttributesTooltip(tooltips, context, this.getStack());
+    }
+
+    @Override
+    public List<Component> getAttributesTooltip(List<Component> tooltips) {
+        return getAttributesTooltip(tooltips, Item.TooltipContext.EMPTY);
     }
 
     @Override

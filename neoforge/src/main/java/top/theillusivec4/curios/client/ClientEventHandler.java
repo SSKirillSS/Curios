@@ -71,7 +71,6 @@ public class ClientEventHandler {
     public void onTooltip(ItemTooltipEvent evt) {
         ItemStack stack = evt.getItemStack();
         Player player = evt.getEntity();
-        HolderLookup.Provider registriesProvider = evt.getContext().registries();
 
         if (!stack.isEmpty()) {
             List<Component> tooltip = evt.getToolTip();
@@ -261,7 +260,7 @@ public class ClientEventHandler {
                 }
                 optionalCurio.ifPresent(curio -> {
                     List<Component> actualAttributeTooltips =
-                            curio.getAttributesTooltip(attributeTooltip, registriesProvider);
+                            curio.getAttributesTooltip(attributeTooltip, evt.getContext());
 
                     if (!actualAttributeTooltips.isEmpty()) {
                         tooltip.addAll(actualAttributeTooltips);

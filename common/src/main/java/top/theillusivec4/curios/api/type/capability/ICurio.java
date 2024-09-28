@@ -38,6 +38,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -244,11 +245,16 @@ public interface ICurio {
      * similar to the vanilla attribute modifier tooltips.
      *
      * @param tooltips A list of {@link Component} with the attribute modifier information
-     * @param registriesProvider Registry provider for retrieving Holders of data-driven objects
+     * @param context A context for retrieving tooltip data
      * @return A list of ITextComponent to display as curio attribute modifier information
      */
-    default List<Component> getAttributesTooltip(List<Component> tooltips, HolderLookup.Provider registriesProvider) {
+    default List<Component> getAttributesTooltip(List<Component> tooltips, Item.TooltipContext context) {
         return new ArrayList<>();
+    }
+
+    @Deprecated(forRemoval = true, since = "1.22")
+    default List<Component> getAttributesTooltip(List<Component> tooltips) {
+        return getAttributesTooltip(tooltips, Item.TooltipContext.EMPTY);
     }
 
     /**
