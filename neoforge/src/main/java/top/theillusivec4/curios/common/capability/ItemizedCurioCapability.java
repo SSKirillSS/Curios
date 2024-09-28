@@ -22,6 +22,7 @@ package top.theillusivec4.curios.common.capability;
 
 import com.google.common.collect.Multimap;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -102,8 +103,8 @@ public class ItemizedCurioCapability implements ICurio {
     }
 
     @Override
-    public List<Component> getAttributesTooltip(List<Component> tooltips) {
-        return this.curioItem.getAttributesTooltip(tooltips, this.getStack());
+    public List<Component> getAttributesTooltip(List<Component> tooltips, HolderLookup.Provider registriesProvider) {
+        return this.curioItem.getAttributesTooltip(tooltips, registriesProvider, this.getStack());
     }
 
     @Override

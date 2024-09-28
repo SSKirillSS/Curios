@@ -21,11 +21,11 @@
 package top.theillusivec4.curios.client;
 
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -40,13 +40,11 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotAttribute;
 import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.type.ICuriosMenu;
 import top.theillusivec4.curios.api.type.ISlotType;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.common.network.client.CPacketOpenCurios;
@@ -73,6 +71,7 @@ public class ClientEventHandler {
     public void onTooltip(ItemTooltipEvent evt) {
         ItemStack stack = evt.getItemStack();
         Player player = evt.getEntity();
+        HolderLookup.Provider registriesProvider = evt.getContext().registries();
 
         if (!stack.isEmpty()) {
             List<Component> tooltip = evt.getToolTip();
@@ -262,7 +261,7 @@ public class ClientEventHandler {
                 }
                 optionalCurio.ifPresent(curio -> {
                     List<Component> actualAttributeTooltips =
-                            curio.getAttributesTooltip(attributeTooltip);
+                            curio.getAttributesTooltip(attributeTooltip, registriesProvider);
 
                     if (!actualAttributeTooltips.isEmpty()) {
                         tooltip.addAll(actualAttributeTooltips);

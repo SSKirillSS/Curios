@@ -23,6 +23,7 @@ package top.theillusivec4.curios.api.type.capability;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
@@ -243,9 +244,10 @@ public interface ICurio {
      * similar to the vanilla attribute modifier tooltips.
      *
      * @param tooltips A list of {@link Component} with the attribute modifier information
+     * @param registriesProvider Registry provider for retrieving Holders of data-driven objects
      * @return A list of ITextComponent to display as curio attribute modifier information
      */
-    default List<Component> getAttributesTooltip(List<Component> tooltips) {
+    default List<Component> getAttributesTooltip(List<Component> tooltips, HolderLookup.Provider registriesProvider) {
         return new ArrayList<>();
     }
 
