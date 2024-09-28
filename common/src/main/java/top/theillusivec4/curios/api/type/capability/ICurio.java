@@ -120,6 +120,11 @@ public interface ICurio {
      * @param tooltips A list of {@link Component} with every slot valid for this curio
      * @return A list of ITextComponent to display as curio slot information
      */
+    default List<Component> getSlotsTooltip(List<Component> tooltips, Item.TooltipContext context) {
+        return getSlotsTooltip(tooltips);
+    }
+
+    @Deprecated(forRemoval = true, since = "1.22")
     default List<Component> getSlotsTooltip(List<Component> tooltips) {
         return tooltips;
     }
@@ -249,12 +254,12 @@ public interface ICurio {
      * @return A list of ITextComponent to display as curio attribute modifier information
      */
     default List<Component> getAttributesTooltip(List<Component> tooltips, Item.TooltipContext context) {
-        return tooltips;
+        return getAttributesTooltip(tooltips);
     }
 
     @Deprecated(forRemoval = true, since = "1.22")
     default List<Component> getAttributesTooltip(List<Component> tooltips) {
-        return getAttributesTooltip(tooltips, Item.TooltipContext.EMPTY);
+        return tooltips;
     }
 
     /**

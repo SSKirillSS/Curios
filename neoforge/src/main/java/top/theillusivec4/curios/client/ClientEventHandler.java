@@ -94,7 +94,9 @@ public class ClientEventHandler {
             slotsTooltip.append(type);
         }
 
-        tooltip.addAll(1, curio.getSlotsTooltip(Arrays.asList(slotsTooltip)));
+        var context = event.getContext();
+
+        tooltip.addAll(1, curio.getSlotsTooltip(Arrays.asList(slotsTooltip), context));
 
         List<Component> attributesTooltip = new ArrayList<>();
 
@@ -108,9 +110,9 @@ public class ClientEventHandler {
             attributesTooltip.add(Component.translatable("curios.modifiers." + identifier).withStyle(ChatFormatting.GOLD));
 
             if (player != null)
-                AttributeUtil.applyTextFor(stack, attributesTooltip::add, attributes, AttributeTooltipContext.of(player, event.getContext(), event.getFlags()));
+                AttributeUtil.applyTextFor(stack, attributesTooltip::add, attributes, AttributeTooltipContext.of(player, context, event.getFlags()));
         }
 
-        tooltip.addAll(2, curio.getAttributesTooltip(attributesTooltip, event.getContext()));
+        tooltip.addAll(2, curio.getAttributesTooltip(attributesTooltip, context));
     }
 }

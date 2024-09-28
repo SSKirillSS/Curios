@@ -134,8 +134,13 @@ public interface ICurioItem {
      * @param stack    The ItemStack in question
      * @return A list of ITextComponent to display as curio slot information
      */
+    default List<Component> getSlotsTooltip(List<Component> tooltips, Item.TooltipContext context, ItemStack stack) {
+        return defaultInstance.getSlotsTooltip(tooltips, context);
+    }
+
+    @Deprecated(forRemoval = true, since = "1.22")
     default List<Component> getSlotsTooltip(List<Component> tooltips, ItemStack stack) {
-        return defaultInstance.getSlotsTooltip(tooltips);
+        return defaultInstance.getSlotsTooltip(tooltips, Item.TooltipContext.EMPTY);
     }
 
     /**
@@ -274,7 +279,7 @@ public interface ICurioItem {
 
     @Deprecated(forRemoval = true, since = "1.22")
     default List<Component> getAttributesTooltip(List<Component> tooltips, ItemStack stack) {
-        return getAttributesTooltip(tooltips, Item.TooltipContext.EMPTY, stack);
+        return defaultInstance.getAttributesTooltip(tooltips, Item.TooltipContext.EMPTY);
     }
 
     /**
