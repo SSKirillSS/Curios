@@ -42,7 +42,7 @@ public class SlotAttribute extends Attribute {
     }
 
     protected SlotAttribute(String identifier) {
-        super("curios.slot." + identifier, 0);
+        super("curios.identifier." + identifier, 0);
         this.identifier = identifier;
     }
 

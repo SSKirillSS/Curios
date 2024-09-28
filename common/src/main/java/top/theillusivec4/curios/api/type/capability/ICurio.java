@@ -249,7 +249,7 @@ public interface ICurio {
      * @return A list of ITextComponent to display as curio attribute modifier information
      */
     default List<Component> getAttributesTooltip(List<Component> tooltips, Item.TooltipContext context) {
-        return new ArrayList<>();
+        return tooltips;
     }
 
     @Deprecated(forRemoval = true, since = "1.22")
