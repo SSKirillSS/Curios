@@ -102,7 +102,6 @@ processResources {
             "sources_url": sources_url,
             "description": project.description,
             "neoforge_version": neoforge_version,
-            "neoforge_version_range": neoforge_version_range,
             "forge_version": forge_version,
             "forge_version_range": forge_version_range,
             "java_version": java_version
@@ -112,31 +111,4 @@ processResources {
         expand expandProps
     }
     inputs.properties(expandProps)
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId base.archivesName.get()
-            artifact jar
-            artifact sourcesJar
-            artifact apiJar
-        }
-    }
-    repositories {
-
-        if (project.hasProperty('urlMaven')) {
-
-            if (project.hasProperty('userMaven') && project.hasProperty('passMaven')) {
-
-                maven {
-                    url urlMaven
-                    credentials {
-                        username userMaven
-                        password passMaven
-                    }
-                }
-            }
-        }
-    }
 }
