@@ -61,13 +61,6 @@ public class ClientEventHandler {
         if (stack.isEmpty())
             return;
 
-        var optional = CuriosApi.getCurio(stack);
-
-        if (optional.isEmpty())
-            return;
-
-        var curio = optional.get();
-
         var tooltip = event.getToolTip();
 
         var tags = Set.copyOf((player != null ? CuriosApi.getItemStackSlots(stack, player) : CuriosApi.getItemStackSlots(stack, FMLLoader.getDist() == Dist.CLIENT)).keySet());
@@ -96,7 +89,11 @@ public class ClientEventHandler {
 
         var context = event.getContext();
 
-        tooltip.addAll(1, curio.getSlotsTooltip(Arrays.asList(slotsTooltip), context));
+        var curio = CuriosApi.getCurio(stack);
+
+        tooltip.addAll(1, curio.isPresent()
+                ? curio.get().getSlotsTooltip(Arrays.asList(slotsTooltip), context)
+                : Arrays.asList(slotsTooltip));
 
         List<Component> attributesTooltip = new ArrayList<>();
 
@@ -113,6 +110,8 @@ public class ClientEventHandler {
                 AttributeUtil.applyTextFor(stack, attributesTooltip::add, attributes, AttributeTooltipContext.of(player, context, event.getFlags()));
         }
 
-        tooltip.addAll(2, curio.getAttributesTooltip(attributesTooltip, context));
+        tooltip.addAll(2, curio.isPresent()
+                ? curio.get().getAttributesTooltip(attributesTooltip, context)
+                : attributesTooltip);
     }
 }
