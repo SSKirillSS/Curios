@@ -63,6 +63,8 @@ public class CurioInventory implements INBTSerializable<CompoundTag> {
                                 slotType.getDropRule()));
             }
         } else {
+            this.markDeserialized = false;
+
             ListTag tagList = this.deserialized.getList("Curios", Tag.TAG_COMPOUND);
             Map<String, ICurioStacksHandler> curios = new LinkedHashMap<>();
             SortedMap<ISlotType, ICurioStacksHandler> sortedCurios = new TreeMap<>();
@@ -159,7 +161,6 @@ public class CurioInventory implements INBTSerializable<CompoundTag> {
                     (slotType, stacksHandler) -> curios.put(slotType.getIdentifier(), stacksHandler));
             this.curios.putAll(curios);
             this.deserialized = new CompoundTag();
-            this.markDeserialized = false;
         }
     }
 
