@@ -64,17 +64,15 @@ public class DynamicStackHandler extends ItemStackHandler implements IDynamicSta
 
     @Override
     public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-        SlotContext ctx = ctxBuilder.apply(slot);
-        CurioCanEquipEvent equipEvent = new CurioCanEquipEvent(stack, ctx);
-        NeoForge.EVENT_BUS.post(equipEvent);
-        TriState result = equipEvent.getEquipResult();
+        var ctx = ctxBuilder.apply(slot);
 
-        if (result == TriState.FALSE) {
-            return false;
-        }
-        return result == TriState.TRUE || (CuriosApi.isStackValid(ctx, stack) &&
-                CuriosApi.getCurio(stack).map(curio -> curio.canEquip(ctx)).orElse(true) &&
-                super.isItemValid(slot, stack));
+        var canEquip = (CuriosApi.isStackValid(ctx, stack) && CuriosApi.getCurio(stack).map(curio -> curio.canEquip(ctx)).orElse(true) && super.isItemValid(slot, stack));
+
+        var event = new CurioCanEquipEvent(stack, ctx, canEquip ? TriState.TRUE : TriState.FALSE);
+
+        NeoForge.EVENT_BUS.post(event);
+
+        return event.getEquipResult() != TriState.FALSE;
     }
 
     @Override
