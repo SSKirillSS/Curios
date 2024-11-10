@@ -19,35 +19,38 @@
 
 package top.theillusivec4.curiostest.common;
 
-import java.util.function.Supplier;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import top.theillusivec4.curiostest.CuriosTest;
 import top.theillusivec4.curiostest.common.item.AmuletItem;
 import top.theillusivec4.curiostest.common.item.CrownItem;
 import top.theillusivec4.curiostest.common.item.KnucklesItem;
 import top.theillusivec4.curiostest.common.item.RingItem;
-import top.theillusivec4.curiostest.common.item.TestArmor;
+
+import java.util.function.Function;
 
 public class CuriosTestRegistry {
+    private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(CuriosTest.MODID);
 
-  private static final DeferredRegister<Item> ITEMS =
-      DeferredRegister.create(Registries.ITEM, CuriosTest.MODID);
+    public static final DeferredItem<Item> RING = register("ring", RingItem::new, new Item.Properties().stacksTo(1));
+    public static final DeferredItem<Item> AMULET = register("amulet", AmuletItem::new, new Item.Properties().stacksTo(1));
+    public static final DeferredItem<Item> CROWN = register("crown", CrownItem::new, new Item.Properties().stacksTo(1));
+    public static final DeferredItem<Item> KNUCKLES = register("knuckles", KnucklesItem::new, new Item.Properties().stacksTo(1));
 
-  public static final Supplier<Item> RING = ITEMS.register("ring", RingItem::new);
-  public static final Supplier<Item> AMULET = ITEMS.register("amulet", AmuletItem::new);
-  public static final Supplier<Item> CROWN = ITEMS.register("crown", CrownItem::new);
-  public static final Supplier<Item> KNUCKLES = ITEMS.register("knuckles", KnucklesItem::new);
+    private static DeferredItem<Item> register(String id, Function<Item.Properties, Item> func, Item.Properties properties) {
+        var key = ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(CuriosTest.MODID, id));
 
-//  public static final Supplier<Item> TEST_ARMOR = ITEMS.register("test_armor",
-//      () -> new TestArmor(ArmorMaterials.DIAMOND, ArmorItem.Type.CHESTPLATE,
-//          new Item.Properties()));
+        properties = properties.setId(key);
 
-  public static void init(IEventBus eventBus) {
-    ITEMS.register(eventBus);
-  }
+        return ITEMS.registerItem(id, func, properties);
+    }
+
+    public static void init(IEventBus eventBus) {
+        ITEMS.register(eventBus);
+    }
 }

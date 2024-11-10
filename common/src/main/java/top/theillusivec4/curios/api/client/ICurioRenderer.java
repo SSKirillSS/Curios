@@ -22,35 +22,29 @@ package top.theillusivec4.curios.api.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import io.netty.util.internal.UnstableApi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.SlotContext;
 
+@Deprecated
+@UnstableApi
 public interface ICurioRenderer {
-
     /**
      * Performs rendering of the curio.
      *
      * @param slotContext The slot context of the curio that is being rendered
      */
-    <T extends LivingEntity, M extends EntityModel<T>> void render(ItemStack stack,
-                                                                   SlotContext slotContext,
-                                                                   PoseStack matrixStack,
-                                                                   RenderLayerParent<T, M> renderLayerParent,
-                                                                   MultiBufferSource renderTypeBuffer,
-                                                                   int light, float limbSwing,
-                                                                   float limbSwingAmount,
-                                                                   float partialTicks,
-                                                                   float ageInTicks, float netHeadYaw,
-                                                                   float headPitch);
+    <S extends EntityRenderState, M extends EntityModel<S>> void render(ItemStack stack, SlotContext slotContext, PoseStack matrixStack, RenderLayerParent<S, M> renderLayerParent, MultiBufferSource renderTypeBuffer, int light, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch);
 
     /**
      * Translates the rendering for the curio if the entity is sneaking.
@@ -58,10 +52,8 @@ public interface ICurioRenderer {
      * @param livingEntity The wearer of the curio
      */
     static void translateIfSneaking(final PoseStack matrixStack, final LivingEntity livingEntity) {
-
-        if (livingEntity.isCrouching()) {
+        if (livingEntity.isCrouching())
             matrixStack.translate(0.0F, 0.1875F, 0.0F);
-        }
     }
 
     /**
@@ -72,22 +64,10 @@ public interface ICurioRenderer {
      * @param livingEntity The wearer of the curio
      */
     static void rotateIfSneaking(final PoseStack matrixStack, final LivingEntity livingEntity) {
-
-        if (livingEntity.isCrouching()) {
-            EntityRenderer<? super LivingEntity> render =
-                    Minecraft.getInstance().getEntityRenderDispatcher()
-                            .getRenderer(livingEntity);
-
-            if (render instanceof LivingEntityRenderer) {
-                @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>
-                        livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
-                EntityModel<LivingEntity> model = livingRenderer.getModel();
-
-                if (model instanceof HumanoidModel) {
-                    matrixStack.mulPose(Axis.XP.rotation(((HumanoidModel<LivingEntity>) model).body.xRot));
-                }
-            }
-        }
+        if (livingEntity.isCrouching()
+                && Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(livingEntity) instanceof LivingEntityRenderer<?, ?, ?> livingRenderer
+                && livingRenderer.getModel() instanceof HumanoidModel<?> humanoidModel)
+            matrixStack.mulPose(Axis.XP.rotation(humanoidModel.body.xRot));
     }
 
     /**
@@ -99,24 +79,11 @@ public interface ICurioRenderer {
      * @param livingEntity The wearer of the curio
      * @param renderers    The list of model renderers to align to the head movement
      */
-    static void followHeadRotations(final LivingEntity livingEntity,
-                                    final ModelPart... renderers) {
-
-        EntityRenderer<? super LivingEntity> render =
-                Minecraft.getInstance().getEntityRenderDispatcher()
-                        .getRenderer(livingEntity);
-
-        if (render instanceof LivingEntityRenderer) {
-            @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>
-                    livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
-            EntityModel<LivingEntity> model = livingRenderer.getModel();
-
-            if (model instanceof HumanoidModel) {
-
-                for (ModelPart renderer : renderers) {
-                    renderer.copyFrom(((HumanoidModel<LivingEntity>) model).head);
-                }
-            }
+    static void followHeadRotations(final LivingEntity livingEntity, final ModelPart... renderers) {
+        if (Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(livingEntity) instanceof LivingEntityRenderer<?, ?, ?> livingRenderer
+                && livingRenderer.getModel() instanceof HumanoidModel<?> humanoidModel) {
+            for (ModelPart renderer : renderers)
+                renderer.copyFrom(humanoidModel.head);
         }
     }
 
@@ -129,25 +96,11 @@ public interface ICurioRenderer {
      * @param models       The list of models to align to the body movement
      */
     @SafeVarargs
-    static void followBodyRotations(final LivingEntity livingEntity,
-                                    final HumanoidModel<LivingEntity>... models) {
-
-        EntityRenderer<? super LivingEntity> render =
-                Minecraft.getInstance().getEntityRenderDispatcher()
-                        .getRenderer(livingEntity);
-
-        if (render instanceof LivingEntityRenderer) {
-            @SuppressWarnings("unchecked") LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>
-                    livingRenderer = (LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>>) render;
-            EntityModel<LivingEntity> entityModel = livingRenderer.getModel();
-
-            if (entityModel instanceof HumanoidModel) {
-
-                for (HumanoidModel<LivingEntity> model : models) {
-                    HumanoidModel<LivingEntity> bipedModel = (HumanoidModel<LivingEntity>) entityModel;
-                    bipedModel.copyPropertiesTo(model);
-                }
-            }
+    static void followBodyRotations(final LivingEntity livingEntity, final HumanoidModel<HumanoidRenderState>... models) {
+        if (Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(livingEntity) instanceof LivingEntityRenderer<?, ?, ?> livingRenderer
+                && livingRenderer.getModel() instanceof HumanoidModel<?> humanoidModel) {
+            for (HumanoidModel<HumanoidRenderState> model : models)
+                ((HumanoidModel<HumanoidRenderState>) humanoidModel).copyPropertiesTo(model);
         }
     }
 }

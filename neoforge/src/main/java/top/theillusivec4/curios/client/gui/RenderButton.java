@@ -23,6 +23,7 @@ package top.theillusivec4.curios.client.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
@@ -60,7 +61,7 @@ public class RenderButton extends Button {
         if (!slot.getRenderStatus()) {
             j += 8;
         }
-        guiGraphics.blit(this.resourceLocation, this.getX(), this.getY(), (float) j,
+        guiGraphics.blit(RenderType::guiTextured, this.resourceLocation, this.getX(), this.getY(), (float) j,
                 (float) this.yTexStart,
                 this.width, this.height, 256, 256);
         RenderSystem.enableDepthTest();

@@ -31,10 +31,12 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.neoforged.api.distmarker.Dist;
@@ -54,8 +56,7 @@ import top.theillusivec4.curios.common.network.server.SPacketQuickMove;
 import javax.annotation.Nonnull;
 import java.util.*;
 
-public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeInput>> implements ICuriosMenu {
-
+public class CuriosContainer extends AbstractCraftingMenu implements ICuriosMenu {
     private static final ResourceLocation[] ARMOR_SLOT_TEXTURES = new ResourceLocation[]{
             InventoryMenu.EMPTY_ARMOR_SLOT_BOOTS, InventoryMenu.EMPTY_ARMOR_SLOT_LEGGINGS,
             InventoryMenu.EMPTY_ARMOR_SLOT_CHESTPLATE, InventoryMenu.EMPTY_ARMOR_SLOT_HELMET};
@@ -85,7 +86,7 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
     }
 
     public CuriosContainer(int windowId, Inventory playerInventory) {
-        super(CuriosRegistry.CURIO_MENU.get(), windowId);
+        super(CuriosRegistry.CURIO_MENU.get(), windowId, 2, 2);
         this.player = playerInventory.player;
         this.isLocalWorld = this.player.level().isClientSide;
         this.curiosHandler = CuriosApi.getCuriosInventory(this.player).orElse(null);
@@ -300,7 +301,7 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
                 RecipeHolder<CraftingRecipe> recipeholder = optional.get();
                 CraftingRecipe craftingrecipe = recipeholder.value();
 
-                if (this.craftResult.setRecipeUsed(this.player.level(), serverplayer, recipeholder)) {
+                if (this.craftResult.setRecipeUsed(serverplayer, recipeholder)) {
                     ItemStack itemstack1 =
                             craftingrecipe.assemble(this.craftMatrix.asCraftInput(), this.player.level().registryAccess());
 
@@ -458,6 +459,21 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
         return result;
     }
 
+    @Override
+    public Slot getResultSlot() {
+        return null;
+    }
+
+    @Override
+    public List<Slot> getInputGridSlots() {
+        return List.of();
+    }
+
+    @Override
+    public void fillCraftSlotsStackedContents(StackedItemContents stackedItemContents) {
+        this.craftMatrix.fillStackedContents(stackedItemContents);
+    }
+
     @Nonnull
     @Override
     public RecipeBookType getRecipeBookType() {
@@ -465,44 +481,8 @@ public class CuriosContainer extends RecipeBookMenu<RecipeInput, Recipe<RecipeIn
     }
 
     @Override
-    public boolean shouldMoveToInventory(int index) {
-        return index != this.getResultSlotIndex();
-    }
-
-    @Override
-    public void fillCraftSlotsStackedContents(@Nonnull StackedContents itemHelperIn) {
-        this.craftMatrix.fillStackedContents(itemHelperIn);
-    }
-
-    @Override
-    public void clearCraftingContent() {
-        this.craftMatrix.clearContent();
-        this.craftResult.clearContent();
-    }
-
-    @Override
-    public boolean recipeMatches(RecipeHolder recipeHolder) {
-        return recipeHolder.value().matches(this.craftMatrix.asCraftInput(), this.player.level());
-    }
-
-    @Override
-    public int getResultSlotIndex() {
-        return 0;
-    }
-
-    @Override
-    public int getGridWidth() {
-        return this.craftMatrix.getWidth();
-    }
-
-    @Override
-    public int getGridHeight() {
-        return this.craftMatrix.getHeight();
-    }
-
-    @Override
-    public int getSize() {
-        return 5;
+    protected Player owner() {
+        return player;
     }
 
     public void nextPage() {

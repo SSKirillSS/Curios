@@ -62,8 +62,6 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerXpEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotAttribute;
@@ -321,9 +319,8 @@ public class CuriosEventHandler {
                 List<Tuple<Predicate<ItemStack>, DropRule>> dropRules = dropRulesEvent.getOverrides();
                 boolean keepInventory = false;
 
-                if (livingEntity instanceof Player) {
-                    keepInventory =
-                            livingEntity.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
+                if (livingEntity instanceof Player player && player.level() instanceof ServerLevel level) {
+                    keepInventory = level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY);
 
                     if (CuriosConfig.SERVER.keepCurios.get() != CuriosConfig.KeepCurios.DEFAULT) {
                         keepInventory = CuriosConfig.SERVER.keepCurios.get() == CuriosConfig.KeepCurios.ON;
@@ -394,8 +391,7 @@ public class CuriosEventHandler {
                                         int count = stack.getCount();
                                         stack.shrink(count);
                                     }
-                                    evt.setCancellationResult(
-                                            InteractionResult.sidedSuccess(player.level().isClientSide()));
+                                    evt.setCancellationResult(InteractionResult.SUCCESS_SERVER);
                                     evt.setCanceled(true);
                                     return;
                                 } else if (firstSlot == null) {
@@ -417,8 +413,7 @@ public class CuriosEventHandler {
                         stackHandler.setStackInSlot(i, stack.copy());
                         curio.onEquipFromUse(slotContext);
                         player.setItemInHand(evt.getHand(), present.copy());
-                        evt.setCancellationResult(
-                                InteractionResult.sidedSuccess(player.level().isClientSide()));
+                        evt.setCancellationResult(InteractionResult.SUCCESS_SERVER);
                         evt.setCanceled(true);
                     }
                 }));

@@ -22,7 +22,7 @@ package top.theillusivec4.curios.common.data;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.gson.*;
+import com.google.gson.JsonParseException;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -31,7 +31,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import org.apache.commons.lang3.EnumUtils;
@@ -45,65 +44,65 @@ import top.theillusivec4.curios.common.slottype.SlotType;
 import javax.annotation.Nonnull;
 import java.util.*;
 
-public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
-
-    private static final Gson GSON =
-            (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
+public class CuriosSlotManager extends SimpleJsonResourceReloadListener<CuriosSlotData> {
     public static CuriosSlotManager SERVER = new CuriosSlotManager();
     public static CuriosSlotManager CLIENT = new CuriosSlotManager();
+
     private Map<String, ISlotType> slots = ImmutableMap.of();
     private Set<String> configSlots = ImmutableSet.of();
     private Map<String, ResourceLocation> icons = ImmutableMap.of();
     private Map<String, Set<String>> idToMods = ImmutableMap.of();
+
     private ICondition.IContext ctx = ICondition.IContext.EMPTY;
 
     public CuriosSlotManager() {
-        super(GSON, "curios/slots");
+        super(CuriosSlotData.CODEC, "curios/slots");
     }
 
     public CuriosSlotManager(ICondition.IContext ctx) {
-        super(GSON, "curios/slots");
+        super(CuriosSlotData.CODEC, "curios/slots");
         this.ctx = ctx;
     }
 
-    protected void apply(@Nonnull Map<ResourceLocation, JsonElement> pObject,
-                         @Nonnull ResourceManager pResourceManager,
-                         @Nonnull ProfilerFiller pProfiler) {
+    @Override
+    protected void apply(@Nonnull Map<ResourceLocation, CuriosSlotData> resourceLocationSlotTypeDataMap,
+                         @Nonnull ResourceManager resourceManager,
+                         @Nonnull ProfilerFiller profiler) {
         Map<String, SlotType.Builder> map = new HashMap<>();
         Map<String, ImmutableSet.Builder<String>> modMap = new HashMap<>();
-        Map<ResourceLocation, JsonElement> sorted = new LinkedHashMap<>();
-        pResourceManager.listPacks().forEach(packResources -> {
-            Set<String> namespaces = packResources.getNamespaces(PackType.SERVER_DATA);
-            namespaces.forEach(
-                    namespace -> packResources.listResources(PackType.SERVER_DATA, namespace, "curios/slots",
-                            (resourceLocation, inputStreamIoSupplier) -> {
-                                String path = resourceLocation.getPath();
-                                ResourceLocation rl = ResourceLocation.fromNamespaceAndPath(namespace,
-                                        path.substring("curios/slots/".length(), path.length() - ".json".length()));
+        Map<ResourceLocation, CuriosSlotData> sorted = new LinkedHashMap<>();
 
-                                JsonElement el = pObject.get(rl);
-                                if (el != null) {
-                                    sorted.put(rl, el);
-                                }
-                            }));
+        resourceManager.listPacks().forEach(packResources -> {
+            Set<String> namespaces = packResources.getNamespaces(PackType.SERVER_DATA);
+            namespaces.forEach(namespace -> packResources.listResources(PackType.SERVER_DATA, namespace, "curios/slots",
+                    (resourceLocation, inputStreamIoSupplier) -> {
+                        String path = resourceLocation.getPath();
+                        ResourceLocation rl = ResourceLocation.fromNamespaceAndPath(namespace, path.substring("curios/slots/".length(), path.length() - ".json".length()));
+
+                        CuriosSlotData data = resourceLocationSlotTypeDataMap.get(rl);
+                        if (data != null) {
+                            sorted.put(rl, data);
+                        }
+                    }));
         });
 
-        for (Map.Entry<ResourceLocation, JsonElement> entry : sorted.entrySet()) {
+        for (Map.Entry<ResourceLocation, CuriosSlotData> entry : sorted.entrySet()) {
             ResourceLocation resourcelocation = entry.getKey();
 
             if (resourcelocation.getNamespace().equals("curios")) {
-
                 try {
                     String id = resourcelocation.getPath();
+                    CuriosSlotData data = entry.getValue();
 
-                    if (!ICondition.conditionsMatched(JsonOps.INSTANCE, entry.getValue().getAsJsonObject())) {
+                    if (!ICondition.conditionsMatched(JsonOps.INSTANCE, data.toJson())) {
                         CuriosConstants.LOG.debug("Skipping loading slot {} as its conditions were not met",
                                 resourcelocation);
                         continue;
                     }
-                    fromJson(map.computeIfAbsent(id, (k) -> new SlotType.Builder(id)),
-                            GsonHelper.convertToJsonObject(entry.getValue(), "top element"));
-                    modMap.computeIfAbsent(id, (k) -> ImmutableSet.builder())
+
+                    SlotType.Builder builder = map.computeIfAbsent(id, SlotType.Builder::new);
+                    populateBuilderFromData(builder, data);
+                    modMap.computeIfAbsent(id, k -> ImmutableSet.builder())
                             .add(resourcelocation.getNamespace());
                 } catch (IllegalArgumentException | JsonParseException e) {
                     CuriosConstants.LOG.error("Parsing error loading curio slot {}", resourcelocation, e);
@@ -111,7 +110,7 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
             }
         }
 
-        for (Map.Entry<ResourceLocation, JsonElement> entry : sorted.entrySet()) {
+        for (Map.Entry<ResourceLocation, CuriosSlotData> entry : sorted.entrySet()) {
             ResourceLocation resourcelocation = entry.getKey();
 
             if (resourcelocation.getPath().startsWith("_") ||
@@ -121,15 +120,17 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
 
             try {
                 String id = resourcelocation.getPath();
+                CuriosSlotData data = entry.getValue();
 
-                if (!ICondition.conditionsMatched(JsonOps.INSTANCE, entry.getValue().getAsJsonObject())) {
+                if (!ICondition.conditionsMatched(JsonOps.INSTANCE, data.toJson())) {
                     CuriosConstants.LOG.debug("Skipping loading slot {} as its conditions were not met",
                             resourcelocation);
                     continue;
                 }
-                fromJson(map.computeIfAbsent(id, (k) -> new SlotType.Builder(id)),
-                        GsonHelper.convertToJsonObject(entry.getValue(), "top element"));
-                modMap.computeIfAbsent(id, (k) -> ImmutableSet.builder())
+
+                SlotType.Builder builder = map.computeIfAbsent(id, SlotType.Builder::new);
+                populateBuilderFromData(builder, data);
+                modMap.computeIfAbsent(id, k -> ImmutableSet.builder())
                         .add(resourcelocation.getNamespace());
             } catch (IllegalArgumentException | JsonParseException e) {
                 CuriosConstants.LOG.error("Parsing error loading curio slot {}", resourcelocation, e);
@@ -141,16 +142,55 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
             this.configSlots = ImmutableSet.copyOf(configs);
 
             for (String id : configs) {
-                modMap.computeIfAbsent(id, (k) -> ImmutableSet.builder()).add("config");
+                modMap.computeIfAbsent(id, k -> ImmutableSet.builder()).add("config");
             }
         } catch (IllegalArgumentException e) {
             CuriosConstants.LOG.error("Config parsing error", e);
         }
+
+        // Build immutable maps
         this.slots = map.entrySet().stream()
                 .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> entry.getValue().build()));
         this.idToMods = modMap.entrySet().stream()
                 .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> entry.getValue().build()));
+
         CuriosConstants.LOG.info("Loaded {} curio slots", map.size());
+    }
+
+    private static void populateBuilderFromData(SlotType.Builder builder, CuriosSlotData data) {
+        if (data.order() != null) {
+            builder.order(data.order(), true);
+        }
+
+        if (!data.icon().isEmpty()) {
+            builder.icon(ResourceLocation.parse(data.icon()));
+        }
+
+        if (!data.dropRule().isEmpty()) {
+            builder.dropRule(data.dropRule());
+        }
+
+        if (data.size() != null) {
+            builder.size(data.size(), data.operation(), true);
+        }
+
+        if (data.addCosmetic() != null) {
+            builder.hasCosmetic(data.addCosmetic(), true);
+        }
+
+        if (data.useNativeGui() != null) {
+            builder.useNativeGui(data.useNativeGui(), true);
+        }
+
+        if (data.renderToggle() != null) {
+            builder.renderToggle(data.renderToggle(), true);
+        }
+
+        if (data.validators() != null) {
+            for (String validator : data.validators()) {
+                builder.validator(ResourceLocation.parse(validator));
+            }
+        }
     }
 
     public Map<String, ISlotType> getSlots() {
@@ -174,7 +214,6 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
         ImmutableMap.Builder<String, ISlotType> map = ImmutableMap.builder();
 
         for (Tag tag1 : tag) {
-
             if (tag1 instanceof CompoundTag slotType) {
                 ISlotType type = SlotType.from(slotType);
                 map.put(type.getIdentifier(), type);
@@ -196,14 +235,20 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
     }
 
     public ResourceLocation getIcon(String identifier) {
-        return this.icons.getOrDefault(identifier,
-                ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "slot/empty_curio_slot"));
+        return this.icons.getOrDefault(identifier, ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "slot/empty_curio_slot"));
     }
 
     public Map<String, Set<String>> getModsFromSlots() {
         return this.idToMods;
     }
 
+    /**
+     * Parses configuration entries and populates SlotType.Builder instances accordingly.
+     *
+     * @param map The map of slot IDs to their corresponding SlotType.Builder.
+     * @return A set of slot IDs that were configured.
+     * @throws IllegalArgumentException If any configuration entry is invalid.
+     */
     public static Set<String> fromConfig(Map<String, SlotType.Builder> map)
             throws IllegalArgumentException {
         List<Map<String, String>> parsed = new ArrayList<>();
@@ -217,7 +262,9 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
             while (tokenizer.hasMoreTokens()) {
                 String token = tokenizer.nextToken();
                 String[] keyValue = token.split("=");
-                subMap.put(keyValue[0], keyValue[1]);
+                if (keyValue.length == 2) {
+                    subMap.put(keyValue[0].trim(), keyValue[1].trim());
+                }
             }
 
             if (subMap.containsKey("id")) {
@@ -230,7 +277,7 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
 
         for (Map<String, String> entry : parsed) {
             String id = entry.get("id");
-            SlotType.Builder builder = map.computeIfAbsent(id, (k) -> new SlotType.Builder(id));
+            SlotType.Builder builder = map.computeIfAbsent(id, SlotType.Builder::new);
             Integer size = entry.containsKey("size") ? Integer.parseInt(entry.get("size")) : null;
 
             if (size != null && size < 0) {
@@ -291,69 +338,40 @@ public class CuriosSlotManager extends SimpleJsonResourceReloadListener {
         return results;
     }
 
-    public static void fromJson(SlotType.Builder builder, JsonObject jsonObject)
+    public static void fromJson(SlotType.Builder builder, CuriosSlotData slotTypeData)
             throws IllegalArgumentException, JsonParseException {
-        Integer jsonSize = jsonObject.has("size") ? GsonHelper.getAsInt(jsonObject, "size") : null;
 
-        if (jsonSize != null && jsonSize < 0) {
-            throw new IllegalArgumentException("Size cannot be less than 0!");
-        }
-        String operation = GsonHelper.getAsString(jsonObject, "operation", "SET");
-
-        if (!operation.equals("SET") && !operation.equals("ADD") && !operation.equals("REMOVE")) {
-            throw new IllegalArgumentException(operation + " is not a valid operation!");
-        }
-        String jsonDropRule = GsonHelper.getAsString(jsonObject, "drop_rule", "");
-
-        if (!jsonDropRule.isEmpty() && !EnumUtils.isValidEnum(ICurio.DropRule.class, jsonDropRule)) {
-            throw new IllegalArgumentException(jsonDropRule + " is not a valid drop rule!");
-        }
-        boolean replace = GsonHelper.getAsBoolean(jsonObject, "replace", false);
-        Integer jsonOrder = jsonObject.has("order") ? GsonHelper.getAsInt(jsonObject, "order") : null;
-        String jsonIcon = GsonHelper.getAsString(jsonObject, "icon", "");
-        Boolean jsonToggle =
-                jsonObject.has("render_toggle") ? GsonHelper.getAsBoolean(jsonObject, "render_toggle") :
-                        null;
-        Boolean jsonCosmetic =
-                jsonObject.has("add_cosmetic") ? GsonHelper.getAsBoolean(jsonObject, "add_cosmetic") : null;
-        Boolean jsonNative =
-                jsonObject.has("use_native_gui") ? GsonHelper.getAsBoolean(jsonObject, "use_native_gui") :
-                        null;
-        JsonArray jsonSlotResultPredicate = jsonObject.has("validators") ?
-                GsonHelper.getAsJsonArray(jsonObject, "validators") : null;
-
-        if (jsonOrder != null) {
-            builder.order(jsonOrder, replace);
+        if (slotTypeData.order() != null) {
+            builder.order(slotTypeData.order(), slotTypeData.replace());
         }
 
-        if (!jsonIcon.isEmpty()) {
-            builder.icon(ResourceLocation.parse(jsonIcon));
+        if (!slotTypeData.icon().isEmpty()) {
+            builder.icon(ResourceLocation.parse(slotTypeData.icon()));
         }
 
-        if (!jsonDropRule.isEmpty()) {
-            builder.dropRule(jsonDropRule);
+        if (!slotTypeData.dropRule().isEmpty()) {
+            builder.dropRule(slotTypeData.dropRule());
         }
 
-        if (jsonSize != null) {
-            builder.size(jsonSize, operation, replace);
+        if (slotTypeData.size() != null) {
+            builder.size(slotTypeData.size(), slotTypeData.operation(), slotTypeData.replace());
         }
 
-        if (jsonCosmetic != null) {
-            builder.hasCosmetic(jsonCosmetic, replace);
+        if (slotTypeData.addCosmetic() != null) {
+            builder.hasCosmetic(slotTypeData.addCosmetic(), slotTypeData.replace());
         }
 
-        if (jsonNative != null) {
-            builder.useNativeGui(jsonNative, replace);
+        if (slotTypeData.useNativeGui() != null) {
+            builder.useNativeGui(slotTypeData.useNativeGui(), slotTypeData.replace());
         }
 
-        if (jsonToggle != null) {
-            builder.renderToggle(jsonToggle, replace);
+        if (slotTypeData.renderToggle() != null) {
+            builder.renderToggle(slotTypeData.renderToggle(), slotTypeData.replace());
         }
 
-        if (jsonSlotResultPredicate != null) {
-
-            for (JsonElement jsonElement : jsonSlotResultPredicate) {
-                builder.validator(ResourceLocation.parse(jsonElement.getAsString()));
+        if (slotTypeData.validators() != null) {
+            for (String validator : slotTypeData.validators()) {
+                builder.validator(ResourceLocation.parse(validator));
             }
         }
     }

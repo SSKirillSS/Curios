@@ -229,11 +229,10 @@ public class Curios {
 
         @SuppressWarnings({"rawtypes", "unchecked"})
         private static void addPlayerLayer(EntityRenderersEvent.AddLayers evt, PlayerSkin.Model model) {
-            EntityRenderer<? extends Player> renderer = evt.getSkin(model);
+            var renderer = evt.getSkin(model);
 
-            if (renderer instanceof LivingEntityRenderer livingRenderer) {
+            if (renderer instanceof LivingEntityRenderer livingRenderer)
                 livingRenderer.addLayer(new CuriosLayer<>(livingRenderer));
-            }
         }
     }
 }

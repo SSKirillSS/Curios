@@ -21,13 +21,7 @@ package top.theillusivec4.curiostest;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -47,10 +41,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.InterModComms;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -60,24 +52,20 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.CuriosTooltip;
-import top.theillusivec4.curios.api.SlotAttribute;
-import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
+import top.theillusivec4.curios.api.*;
 import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curiostest.client.CuriosLayerDefinitions;
 import top.theillusivec4.curiostest.client.model.AmuletModel;
 import top.theillusivec4.curiostest.client.model.CrownModel;
 import top.theillusivec4.curiostest.client.model.KnucklesModel;
-import top.theillusivec4.curiostest.client.renderer.CrownRenderer;
-import top.theillusivec4.curiostest.client.renderer.KnucklesRenderer;
 import top.theillusivec4.curiostest.common.CuriosTestRegistry;
-import top.theillusivec4.curiostest.common.item.AmuletItem;
 import top.theillusivec4.curiostest.data.CuriosGenerator;
 import top.theillusivec4.curiostest.data.CuriosTestProvider;
+
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.List;
 
 @Mod(CuriosTest.MODID)
 public class CuriosTest {
@@ -261,10 +249,10 @@ public class CuriosTest {
   }
 
   private void clientSetup(final FMLClientSetupEvent evt) {
-    CuriosRendererRegistry.register(CuriosTestRegistry.AMULET.get(),
-        () -> (AmuletItem) CuriosTestRegistry.AMULET.get());
-    CuriosRendererRegistry.register(CuriosTestRegistry.CROWN.get(), CrownRenderer::new);
-    CuriosRendererRegistry.register(CuriosTestRegistry.KNUCKLES.get(), KnucklesRenderer::new);
+//    CuriosRendererRegistry.register(CuriosTestRegistry.AMULET.get(),
+//        () -> (AmuletItem) CuriosTestRegistry.AMULET.get());
+//    CuriosRendererRegistry.register(CuriosTestRegistry.CROWN.get(), CrownRenderer::new);
+//    CuriosRendererRegistry.register(CuriosTestRegistry.KNUCKLES.get(), KnucklesRenderer::new);
   }
 
   private void registerLayers(final EntityRenderersEvent.RegisterLayerDefinitions evt) {

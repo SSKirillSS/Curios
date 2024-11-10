@@ -124,7 +124,7 @@ public class CuriosUtilMixinHooks {
     }
 
     public static int getFortuneLevel(LootContext lootContext) {
-        Entity entity = lootContext.getParamOrNull(LootContextParams.THIS_ENTITY);
+        Entity entity = lootContext.getOptionalParameter(LootContextParams.THIS_ENTITY);
 
         if (entity instanceof LivingEntity livingEntity) {
             return CuriosApi.getCuriosInventory(livingEntity)
@@ -140,7 +140,7 @@ public class CuriosUtilMixinHooks {
     }
 
     public static int getLootingLevel(LootContext lootContext) {
-        Entity entity = lootContext.getParamOrNull(LootContextParams.ATTACKING_ENTITY);
+        Entity entity = lootContext.getOptionalParameter(LootContextParams.ATTACKING_ENTITY);
 
         if (entity instanceof LivingEntity livingEntity) {
             return CuriosApi.getCuriosInventory(livingEntity)

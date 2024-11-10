@@ -26,17 +26,20 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.recipebook.CraftingRecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.CuriosConstants;
 import top.theillusivec4.curios.api.CuriosApi;
@@ -54,13 +57,13 @@ import top.theillusivec4.curios.common.network.client.CPacketToggleRender;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer>
+public class CuriosScreen extends AbstractContainerScreen<CuriosContainer>
         implements RecipeUpdateListener, ICuriosScreen {
 
     static final ResourceLocation CURIO_INVENTORY = ResourceLocation.fromNamespaceAndPath(CuriosConstants.MOD_ID,
             "textures/gui/curios/inventory.png");
 
-    private final RecipeBookComponent recipeBookGui = new RecipeBookComponent();
+    private final CraftingRecipeBookComponent recipeBookGui;
     public boolean widthTooNarrow;
 
     private ImageButton recipeBookButton;
@@ -75,6 +78,8 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
     public CuriosScreen(CuriosContainer curiosContainer, Inventory playerInventory,
                         Component title) {
         super(curiosContainer, playerInventory, title);
+
+        recipeBookGui = new CraftingRecipeBookComponent(curiosContainer);
     }
 
     public static Tuple<Integer, Integer> getButtonOffset(boolean isCreative) {
@@ -101,8 +106,7 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
             this.leftPos = (this.width - this.imageWidth) / 2;
             this.topPos = (this.height - this.imageHeight) / 2;
             this.widthTooNarrow = true;
-            this.recipeBookGui
-                    .init(this.width, this.height, this.minecraft, true, this.menu);
+            this.recipeBookGui.init(this.width, this.height, this.minecraft, true);
             this.addWidget(this.recipeBookGui);
             this.setInitialFocus(this.recipeBookGui);
 
@@ -204,8 +208,7 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
         } else {
             this.recipeBookGui.render(guiGraphics, mouseX, mouseY, partialTicks);
             super.render(guiGraphics, mouseX, mouseY, partialTicks);
-            this.recipeBookGui
-                    .renderGhostRecipe(guiGraphics, this.leftPos, this.topPos, true, partialTicks);
+            this.recipeBookGui.renderGhostRecipe(guiGraphics, true);
 
             boolean isButtonHovered = false;
 
@@ -286,9 +289,7 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
      */
 
     @Override
-    protected void renderBg(@Nonnull GuiGraphics guiGraphics, float partialTicks, int mouseX,
-                            int mouseY) {
-
+    protected void renderBg(@Nonnull GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         if (this.minecraft != null && this.minecraft.player != null) {
 
             if (scrollCooldown > 0 && this.minecraft.player.tickCount % 5 == 0) {
@@ -297,7 +298,7 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
             this.panelWidth = this.menu.panelWidth;
             int i = this.leftPos;
             int j = this.topPos;
-            guiGraphics.blit(INVENTORY_LOCATION, i, j, 0, 0, 176, this.imageHeight);
+            guiGraphics.blit(RenderType::guiTextured, INVENTORY_LOCATION, i, j, 0, 0, 176, this.imageHeight, BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
             InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, i + 26, j + 8, i + 75,
                     j + 78, 30, 0.0625F, mouseX, mouseY, this.minecraft.player);
             CuriosApi.getCuriosInventory(this.minecraft.player).ifPresent(handler -> {
@@ -306,7 +307,7 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
                 boolean pageOffset = this.menu.totalPages > 1;
 
                 if (this.menu.hasCosmetics) {
-                    guiGraphics.blit(CURIO_INVENTORY, i + xOffset + 2, yOffset - 23, 32, 0, 28, 24);
+                    guiGraphics.blit(RenderType::guiTextured, CURIO_INVENTORY, i + xOffset + 2, yOffset - 23, 32, 0, 28, 24, BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
                 }
                 List<Integer> grid = this.menu.grid;
                 xOffset -= (grid.size() - 1) * 18;
@@ -324,17 +325,13 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
                     if (r != 0) {
                         xTexOffset += 7;
                     }
-                    guiGraphics.blit(CURIO_INVENTORY, i + xOffset, yOffset, xTexOffset, 0, 25,
-                            upperHeight);
-                    guiGraphics.blit(CURIO_INVENTORY, i + xOffset, yOffset + upperHeight, xTexOffset, 159, 25,
-                            7);
+                    guiGraphics.blit(RenderType::guiTextured, CURIO_INVENTORY, i + xOffset, yOffset, xTexOffset, 0, 25, upperHeight, BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
+                    guiGraphics.blit(RenderType::guiTextured, CURIO_INVENTORY, i + xOffset, yOffset + upperHeight, xTexOffset, 159, 25, 7, BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
 
                     if (grid.size() == 1) {
                         xTexOffset += 7;
-                        guiGraphics.blit(CURIO_INVENTORY, i + xOffset + 7, yOffset, xTexOffset, 0, 25,
-                                upperHeight);
-                        guiGraphics.blit(CURIO_INVENTORY, i + xOffset + 7, yOffset + upperHeight, xTexOffset,
-                                159, 25, 7);
+                        guiGraphics.blit(RenderType::guiTextured, CURIO_INVENTORY, i + xOffset + 7, yOffset, xTexOffset, 0, 25, upperHeight, 25, upperHeight);
+                        guiGraphics.blit(RenderType::guiTextured, CURIO_INVENTORY, i + xOffset + 7, yOffset + upperHeight, xTexOffset, 159, 25, 7, BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
                     }
 
                     if (r == 0) {
@@ -353,7 +350,7 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
                 for (int rows : grid) {
                     int upperHeight = rows * 18;
 
-                    guiGraphics.blit(CURIO_INVENTORY, i + xOffset, yOffset + 7, 7, 7, 18, upperHeight);
+                    guiGraphics.blit(RenderType::guiTextured, CURIO_INVENTORY, i + xOffset, yOffset + 7, 7, 7, 18, upperHeight, BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
                     xOffset += 18;
                 }
                 RenderSystem.enableBlend();
@@ -361,8 +358,7 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
                 for (Slot slot : this.menu.slots) {
 
                     if (slot instanceof CurioSlot curioSlot && curioSlot.isCosmetic()) {
-                        guiGraphics.blit(CURIO_INVENTORY, slot.x + this.getGuiLeft() - 1,
-                                slot.y + this.getGuiTop() - 1, 32, 50, 18, 18);
+                        guiGraphics.blit(RenderType::guiTextured, CURIO_INVENTORY, slot.x + this.getGuiLeft() - 1, slot.y + this.getGuiTop() - 1, 32, 50, 18, 18, BACKGROUND_TEXTURE_WIDTH, BACKGROUND_TEXTURE_HEIGHT);
                     }
                 }
                 RenderSystem.disableBlend();
@@ -445,9 +441,8 @@ public class CuriosScreen extends EffectRenderingInventoryScreen<CuriosContainer
         this.recipeBookGui.recipesUpdated();
     }
 
-    @Nonnull
     @Override
-    public RecipeBookComponent getRecipeBookComponent() {
-        return this.recipeBookGui;
+    public void fillGhostRecipe(RecipeDisplay recipeDisplay) {
+
     }
 }

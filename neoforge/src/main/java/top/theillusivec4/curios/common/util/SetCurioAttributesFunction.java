@@ -37,13 +37,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProviders;
@@ -94,7 +94,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
     }
 
     @Nonnull
-    public Set<LootContextParam<?>> getReferencedContextParams() {
+    public Set<ContextKey<?>> getReferencedContextParams() {
         return this.modifiers.stream()
                 .flatMap((mod) -> mod.amount.getReferencedContextParams().stream())
                 .collect(ImmutableSet.toImmutableSet());
@@ -145,7 +145,7 @@ public class SetCurioAttributesFunction extends LootItemConditionalFunction {
                         }
                         attribute = SlotAttribute.getOrCreate(identifier);
                     } else {
-                        attribute = BuiltInRegistries.ATTRIBUTE.getHolder(rl).orElse(null);
+                        attribute = BuiltInRegistries.ATTRIBUTE.get(rl).orElse(null);
                     }
                     return attribute;
                 });

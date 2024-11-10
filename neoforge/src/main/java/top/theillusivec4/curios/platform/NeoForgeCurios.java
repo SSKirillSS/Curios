@@ -34,8 +34,7 @@ import java.util.Map;
 public class NeoForgeCurios implements ICuriosPlatform {
 
     @Override
-    public Map<String, ISlotType> getItemStackSlots(ItemStack stack,
-                                                    @Nullable LivingEntity livingEntity) {
+    public Map<String, ISlotType> getItemStackSlots(ItemStack stack, @Nullable LivingEntity livingEntity) {
         return livingEntity != null ? CuriosApi.getItemStackSlots(stack, livingEntity) :
                 CuriosApi.getItemStackSlots(stack, true);
     }
@@ -52,6 +51,6 @@ public class NeoForgeCurios implements ICuriosPlatform {
 
     @Override
     public boolean isEnderMask(ItemStack stack, Player player, EnderMan enderMan) {
-        return stack.isEnderMask(player, enderMan);
+        return stack.isGazeDisguise(player, enderMan);
     }
 }

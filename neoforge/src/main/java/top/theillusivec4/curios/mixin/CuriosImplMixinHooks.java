@@ -194,7 +194,7 @@ public class CuriosImplMixinHooks {
                             }
                         } else {
                             Holder<Attribute> attribute =
-                                    BuiltInRegistries.ATTRIBUTE.getHolder(rl).orElse(null);
+                                    BuiltInRegistries.ATTRIBUTE.get(rl).orElse(null);
 
                             if (attribute != null) {
                                 multimap.put(attribute, new AttributeModifier(id, amount, operation));

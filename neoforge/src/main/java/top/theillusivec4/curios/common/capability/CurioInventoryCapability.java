@@ -29,6 +29,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -279,13 +280,15 @@ public class CurioInventoryCapability implements ICuriosItemHandler {
                         drop -> ItemHandlerHelper.giveItemToPlayer(player, drop));
             } else {
                 this.curioInventory.invalidStacks.forEach(drop -> {
-                    ItemEntity ent = this.livingEntity.spawnAtLocation(drop, 1.0F);
-                    RandomSource rand = this.livingEntity.getRandom();
+                    if (livingEntity.level() instanceof ServerLevel level) {
+                        ItemEntity ent = this.livingEntity.spawnAtLocation(level, drop, 1.0F);
+                        RandomSource rand = this.livingEntity.getRandom();
 
-                    if (ent != null) {
-                        ent.setDeltaMovement(ent.getDeltaMovement()
-                                .add((rand.nextFloat() - rand.nextFloat()) * 0.1F, rand.nextFloat() * 0.05F,
-                                        (rand.nextFloat() - rand.nextFloat()) * 0.1F));
+                        if (ent != null) {
+                            ent.setDeltaMovement(ent.getDeltaMovement()
+                                    .add((rand.nextFloat() - rand.nextFloat()) * 0.1F, rand.nextFloat() * 0.05F,
+                                            (rand.nextFloat() - rand.nextFloat()) * 0.1F));
+                        }
                     }
                 });
             }

@@ -20,13 +20,15 @@
 package top.theillusivec4.curiostest.common.item;
 
 import javax.annotation.Nonnull;
+
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 public class KnucklesItem extends Item {
 
-  public KnucklesItem() {
-    super(new Item.Properties().stacksTo(1));
+  public KnucklesItem(Item.Properties properties) {
+    super(properties);
   }
 
   @Override

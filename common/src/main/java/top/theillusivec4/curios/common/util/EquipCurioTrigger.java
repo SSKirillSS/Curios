@@ -96,7 +96,7 @@ public class EquipCurioTrigger extends SimpleCriterionTrigger<EquipCurioTrigger.
         );
 
         public boolean matches(SlotContext slotContext, ItemStack stack, LootContext lootContext) {
-            Vec3 vec3 = lootContext.getParam(LootContextParams.ORIGIN);
+            Vec3 vec3 = lootContext.getParameter(LootContextParams.ORIGIN);
 
             if (slotContext != null && this.slot().map(slotPredicate -> !slotPredicate.matches(slotContext)).orElse(false)) {
                 return false;

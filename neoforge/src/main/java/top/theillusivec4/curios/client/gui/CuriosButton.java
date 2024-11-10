@@ -25,6 +25,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
@@ -66,12 +67,11 @@ public class CuriosButton extends ImageButton {
                             PacketDistributor.sendToServer(new CPacketOpenVanilla(stack));
                         } else {
 
-                            if (parentGui instanceof InventoryScreen inventory) {
-                                RecipeBookComponent recipeBookGui = inventory.getRecipeBookComponent();
+                            if (parentGui instanceof AbstractRecipeBookScreen<?> screen) {
+                                RecipeBookComponent<?> component = screen.recipeBookComponent;
 
-                                if (recipeBookGui.isVisible()) {
-                                    recipeBookGui.toggleVisibility();
-                                }
+                                if (component.isVisible())
+                                    component.toggleVisibility();
                             }
                             PacketDistributor.sendToServer(new CPacketOpenCurios(stack));
                         }

@@ -24,6 +24,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -66,6 +67,6 @@ public class CosmeticButton extends ImageButton {
         this.setX(this.parentGui.getGuiLeft() - 27);
         this.setY(this.parentGui.getGuiTop() - 18);
         ResourceLocation resourcelocation = sprites1.get(this.isActive(), this.isHoveredOrFocused());
-        guiGraphics.blitSprite(resourcelocation, this.getX(), this.getY(), this.width, this.height);
+        guiGraphics.blitSprite(RenderType::guiTextured, resourcelocation, this.getX(), this.getY(), this.width, this.height);
     }
 }

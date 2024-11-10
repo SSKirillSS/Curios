@@ -19,18 +19,18 @@
 
 package top.theillusivec4.curiostest.common.item;
 
-import javax.annotation.Nonnull;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+import javax.annotation.Nonnull;
+
 public class RingItem extends Item {
+    public RingItem(Item.Properties properties) {
+        super(properties);
+    }
 
-  public RingItem() {
-    super(new Item.Properties().stacksTo(1).durability(0));
-  }
-
-  @Override
-  public boolean isFoil(@Nonnull ItemStack stack) {
-    return true;
-  }
+    @Override
+    public boolean isFoil(@Nonnull ItemStack stack) {
+        return true;
+    }
 }

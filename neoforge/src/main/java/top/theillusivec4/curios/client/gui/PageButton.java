@@ -23,6 +23,7 @@ package top.theillusivec4.curios.client.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -73,8 +74,7 @@ public class PageButton extends Button {
                     Component.translatable("gui.curios.page", this.parentGui.getMenu().currentPage + 1,
                             this.parentGui.getMenu().totalPages), x, y);
         }
-        guiGraphics.blit(CURIO_INVENTORY, this.getX(), this.getY(), xText, yText, this.width,
-                this.height);
+        guiGraphics.blit(RenderType::guiTextured, CURIO_INVENTORY, this.getX(), this.getY(), xText, yText, this.width, this.height, 256, 256);
     }
 
     public enum Type {
