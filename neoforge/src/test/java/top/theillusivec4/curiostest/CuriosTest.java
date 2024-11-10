@@ -56,9 +56,6 @@ import top.theillusivec4.curios.api.*;
 import top.theillusivec4.curios.api.event.CurioAttributeModifierEvent;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curiostest.client.CuriosLayerDefinitions;
-import top.theillusivec4.curiostest.client.model.AmuletModel;
-import top.theillusivec4.curiostest.client.model.CrownModel;
-import top.theillusivec4.curiostest.client.model.KnucklesModel;
 import top.theillusivec4.curiostest.common.CuriosTestRegistry;
 import top.theillusivec4.curiostest.data.CuriosGenerator;
 import top.theillusivec4.curiostest.data.CuriosTestProvider;
@@ -256,8 +253,8 @@ public class CuriosTest {
   }
 
   private void registerLayers(final EntityRenderersEvent.RegisterLayerDefinitions evt) {
-    evt.registerLayerDefinition(CuriosLayerDefinitions.CROWN, CrownModel::createLayer);
-    evt.registerLayerDefinition(CuriosLayerDefinitions.AMULET, AmuletModel::createLayer);
-    evt.registerLayerDefinition(CuriosLayerDefinitions.KNUCKLES, KnucklesModel::createLayer);
+//    evt.registerLayerDefinition(CuriosLayerDefinitions.CROWN, CrownModel::createLayer);
+//    evt.registerLayerDefinition(CuriosLayerDefinitions.AMULET, AmuletModel::createLayer);
+//    evt.registerLayerDefinition(CuriosLayerDefinitions.KNUCKLES, KnucklesModel::createLayer);
   }
 }

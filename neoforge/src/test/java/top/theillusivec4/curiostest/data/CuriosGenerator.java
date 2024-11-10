@@ -7,6 +7,7 @@ import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.LocationPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
@@ -25,17 +26,17 @@ public class CuriosGenerator implements AdvancementProvider.AdvancementGenerator
   public void generate(@Nonnull HolderLookup.Provider registries,
                        @Nonnull Consumer<AdvancementHolder> saver,
                        @Nonnull ExistingFileHelper existingFileHelper) {
-    Advancement.Builder.advancement()
-        .addCriterion("test",
-            CuriosTriggers.equip()
-                .withItem(ItemPredicate.Builder.item()
-                    .of(Items.DIAMOND))
-                .withLocation(LocationPredicate.Builder.location()
-                    .setBiomes(HolderSet.direct(registries.lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.BADLANDS))))
-                .withSlot(SlotPredicate.Builder.slot()
-                    .of("ring", "necklace")
-                    .withIndex(MinMaxBounds.Ints.between(0, 10)))
-                .build())
-        .save(saver, ResourceLocation.fromNamespaceAndPath("curiostest", "test"), existingFileHelper);
+//    Advancement.Builder.advancement()
+//        .addCriterion("test",
+//            CuriosTriggers.equip()
+//                .withItem(ItemPredicate.Builder.item()
+//                    .of(Items.DIAMOND))
+//                .withLocation(LocationPredicate.Builder.location()
+//                    .setBiomes(HolderSet.direct(registries.lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.BADLANDS))))
+//                .withSlot(SlotPredicate.Builder.slot()
+//                    .of("ring", "necklace")
+//                    .withIndex(MinMaxBounds.Ints.between(0, 10)))
+//                .build())
+//        .save(saver, ResourceLocation.fromNamespaceAndPath("curiostest", "test"), existingFileHelper);
   }
 }
